@@ -275,6 +275,7 @@ image:images/DMN-step-27.jpg[]
 
 . Finally let us define the logic for the `PreQualification` decision.
 +
+Save as keep adding each step (you may see validation errors, but they should all go away at the end).
 For this click on the edit context icon for the node, and choose `Context` as the Decision type.
 +
 image:images/DMN-step-28.jpg[]
@@ -320,7 +321,7 @@ Rename the context row and set the data type as we did for the  `Age Eligibility
 +
 image:images/DMN-step-39.jpg[]
 +
-We will againd define a decision table
+We will again define a decision table
 +
 image:images/DMN-step-40.jpg[]
 +
@@ -371,3 +372,316 @@ Similarly, let us also define a FEEL expression for combining the reason string 
 +
 image:images/DMN-step-51.jpg[]
 +
+Finally return the combined value for the Context.
++
+image:images/DMN-step-52.jpg[]
+
+=== Testing the DMN
+Now that we have finished creating the DMN asset, let us test the decisions. For this go back to the asset library and add a Test Scenario asset. Choose the DMN from the drop and save.
+
+image:images/DMN-step-53.jpg[]
+
+
+. The Test Scenario should prepopulate the column names corresponding to our input elements.
++
+image:images/DMN-step-54.jpg[]
++
+Now let us define a sample test set
++
+
+image:images/DMN-step-55.jpg[]
++
+Click on the play button, the Test should be successful. Note that we havent yet defined the `reason` string in the action column. 
+. The `reason` column is a list of string, and can contain a list of error messages pertaining to the evaluation. Lets now double click on the reason column cell. It opens up a editor to add list elements.
++
+
+image:images/DMN-step-56.jpg[]
+
+
+. Choose the option to Create List, and click on `+ Add new item`
++
+Enter the value for the list element as shown below and click on Save.
++
+image:images/DMN-step-57.jpg[]
++
+Now click on Test and it should be succesful.
+. Inspect the Coverage Reports from the right side pane to see the decisions fired as a part of the rule set.
++
+image:images/DMN-step-58.jpg[]
+
+=== Testing the DMN using REST API
+For testing the DMN using REST APIs we will first build and deploy the DMN project. On the project landing page, click on `Deploy` button. 
+
+Let us now use the Kie Server API endpoint for testing the DMN decisions.
+
+Open up the Kie Server Swagger endpoint. Go to the DMN models section.
+
+
+image:images/DMN-step-59.jpg[]
+
+. Expand the POST operation and click on the Try it out button
++
+Set the containerId field to `DMNWorkshop_1.0.0-SNAPSHOT` . Set the Parameter content type and Response content type fields to `application/json`
++
+Pass the following request to lookup the Loan PreQualification decision(note that the namespace of your model is probably different as it is generated. You can lookup the namespace of your model in the response/result of the GET operation you executed ealier, which returned the model description).
++
+```
+{
+  "model-namespace":"https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
+  "model-name":"loan-approval",
+  "dmn-context":{
+    "Applicant":{
+         "name":"Mary",
+         "age":23,
+         "creditScore":200,
+         "monthlyIncome":5600
+     },
+    "Loan": {
+         "amount":40000,
+         "duration":10 
+    }
+  }
+}
+```
++
+Post call should be succesful. The response looks like this.
++
+```
+{
+  "type" : "SUCCESS",
+  "msg" : "OK from container 'DMNWorkshop_1.0.0-SNAPSHOT'",
+  "result" : {
+    "dmn-evaluation-result" : {
+      "messages" : [ {
+        "dmn-message-severity" : "WARN",
+        "message" : "No rule matched for decision table 'Age Eligibility' and no default values were defined. Setting result to null.",
+        "message-type" : "FEEL_EVALUATION_ERROR",
+        "source-id" : "_F999B6B9-1395-4C3D-BA41-63AC4851EE83"
+      } ],
+      "model-namespace" : "https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
+      "model-name" : "loan-approval",
+      "decision-name" : [ ],
+      "dmn-context" : {
+        "Interest Rate" : 1.45,
+        "Loan" : {
+          "duration" : 10,
+          "amount" : 40000
+        },
+        "PreQualification" : {
+          "reason" : [ "Credit too low" ],
+          "preApproval" : false
+        },
+        "Debt to Income" : "function Debt to Income( loanAmount, loanDuration, monthlyIncome, interestRate )",
+        "Applicant" : {
+          "creditScore" : 200,
+          "name" : "Mary",
+          "age" : 23,
+          "monthlyIncome" : 5600
+        }
+      },
+      "decision-results" : {
+        "_F999B6B9-1395-4C3D-BA41-63AC4851EE83" : {
+          "messages" : [ ],
+          "decision-id" : "_F999B6B9-1395-4C3D-BA41-63AC4851EE83",
+          "decision-name" : "PreQualification",
+          "result" : {
+            "reason" : [ "Credit too low" ],
+            "preApproval" : false
+          },
+          "status" : "SUCCEEDED"
+        },
+        "_784AD87C-DDFE-4CB6-8999-45EDA7C2A202" : {
+          "messages" : [ ],
+          "decision-id" : "_784AD87C-DDFE-4CB6-8999-45EDA7C2A202",
+          "decision-name" : "Interest Rate",
+          "result" : 1.45,
+          "status" : "SUCCEEDED"
+        }
+      }
+    }
+  }
+}
+```
+
+. Now we can see that all the decisions are executed. Lets say we want to execute only one of those decisions.
++
+We will invoke the DMN call with decision name `Interest Rate`
+
++
+Perform the POST request with the payload
++
+```
+{
+  "model-namespace":"https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
+  "model-name":"loan-approval",
+  "decision-name":"Interest Rate",
+  "decision-id":null,
+  "dmn-context":{
+    "Applicant":{
+         "name":"Mary",
+         "age":23,
+         "creditScore":200,
+         "monthlyIncome":5600
+     },
+    "Loan": {
+         "amount":40000,
+         "duration":10 
+    }
+  }
+}
+```
++
+We can see that only the `Interest Rate` decision has been executed.
++
+```
+{
+  "type" : "SUCCESS",
+  "msg" : "OK from container 'DMNWorkshop_1.0.0-SNAPSHOT'",
+  "result" : {
+    "dmn-evaluation-result" : {
+      "messages" : [ ],
+      "model-namespace" : "https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
+      "model-name" : "loan-approval",
+      "decision-name" : "Interest Rate",
+      "dmn-context" : {
+        "Interest Rate" : 1.45,
+        "Loan" : {
+          "duration" : 10,
+          "amount" : 40000
+        },
+        "Applicant" : {
+          "creditScore" : 200,
+          "name" : "Mary",
+          "age" : 23,
+          "monthlyIncome" : 5600
+        }
+      },
+      "decision-results" : {
+        "_F999B6B9-1395-4C3D-BA41-63AC4851EE83" : {
+          "messages" : [ ],
+          "decision-id" : "_F999B6B9-1395-4C3D-BA41-63AC4851EE83",
+          "decision-name" : "PreQualification",
+          "result" : null,
+          "status" : "NOT_EVALUATED"
+        },
+        "_784AD87C-DDFE-4CB6-8999-45EDA7C2A202" : {
+          "messages" : [ ],
+          "decision-id" : "_784AD87C-DDFE-4CB6-8999-45EDA7C2A202",
+          "decision-name" : "Interest Rate",
+          "result" : 1.45,
+          "status" : "SUCCEEDED"
+        }
+      }
+    }
+  }
+}
+```
+
+=== Testing the DMN using Java APIs
+
+Red Hat Decision Manager provides a KIE-Server Client API that allows the user to interact with the KIE-Server from a Java client using a higher level API. It abstracts the data marshalling and unmarshalling and the creation and execution of the RESTful commands from the developer, allowing him/her to focus on developing business logic.
+
+In this section we will create a simple Java client for our DMN model.
+
+. Create a new Maven Java JAR project in your favourite IDE (e.g. IntelliJ, Eclipse, Visual Studio Code).
+. Add the following dependency to your project:
++
+```
+<dependency>
+  <groupId>org.kie.server</groupId>
+  <artifactId>kie-server-client</artifactId>
+  <version>7.18.0.Final</version>
+  <scope>compile</scope>
+</dependency>
+```
++
+. Create a Java package in your `src/main/java` folder with the name `org.kie.dmn.lab`.
+. In the package you've just created, create a Java class called `Main`.
+
+. Add a `public static void main(String[] args)` method to your main class.
+. Before we implement our method, we first define a number of constants that we will need when implementing our method (note that the values of your constants can be different depending on your environment, model namespace, etc.):
++
+```
+private static final String KIE_SERVER_URL = "http://localhost:8080/kie-server/services/rest/server";
+private static final String CONTAINER_ID = "DMNWorkshop_1.0.0-SNAPSHOT";
+private static final String USERNAME = "pamAdmin";
+private static final String PASSWORD = "redhatpam1!";
+private static final String DMN_MODEL_NAMESPACE = "https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB";
+private static final String DMN_MODEL_NAME = "loan-approval";
+```
+. KIE-Server client API classes can mostly be retrieved from the `KieServicesFactory` class. We first need to create a `KieServicesConfiguration` instance that will hold our credentials and defines how we want our client to communicate with the server:
++
+```
+KieServicesConfiguration kieServicesConfig = KieServicesFactory.newRestConfiguration(KIE_SERVER_URL, new EnteredCredentialsProvider(USERNAME, PASSWORD));
+kieServicesConfig.setMarshallingFormat(MarshallingFormat.JSON);
+```
++
+. Next, we create the `KieServicesClient`:
++
+```
+KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(kieServicesConfig);
+```
++
+. From this client we retrieve our DMNServicesClient:
++
+```
+DMNServicesClient dmnServicesClient = kieServicesClient.getServicesClient(DMNServicesClient.class);
+```
++
+. To pass the input values to our model to the Execution Server, we need to create a `DMNContext`:
++
+```
+DMNContext dmnContext = dmnServicesClient.newContext();
+```
++
+. We pass the input variables to the `DMNContext`. We define the following three methods that create the data inputs:
++
+```
+
+private static Map<String, Object> getApplicant() {
+	    Map<String, Object> applicantMap = new HashMap<>();
+	    applicant.put("name", "mary");
+	    applicant.put("age", 23);
+        applicant.put("creditScore", 250);
+        applicant.put("monthlyIncome", 5600);
+	    applicantMap.add(applicant);
+	    return applicantMap;
+	}
+
+
+	private static Map<String, Object> getLoan() {
+	    Map<String, Object> loanMap = new HashMap<>();
+	    loanMap.put("amount", 40000);
+        loanMap.put("duration",10)
+	    return loanMap;
+	}
+```
+
+
+
+. We can now add the data to the `DMNContext` as follows:
++
+```
+dmnContext.set("Applicant", getApplicant());
+dmnContext.set("Loan", getLoan());
+```
++
+. We now have defined all the required instances needed to send a DMN evaluation request to the server. We explicitly specify which decision we want to evaluate, in this case the `Interest Rate` decision, by using the `evaluateDecisionByName` of the `DMNServiceClient`.
++
+```
+ServiceResponse<DMNResult> dmnResultResponse = dmnServicesClient.evaluateDecisionByName(CONTAINER_ID, DMN_MODEL_NAMESPACE, DMN_MODEL_NAME, "Interest Rate", dmnContext);
+```
++
+. Finally we can retrieve the DMN evaluation result and print it in the console:
++
+```
+DMNDecisionResult decisionResult = dmnResultResponse.getResult().getDecisionResultByName("Interest Rate");
+System.out.println("Interest Rate: " + decisionResult.getResult());
+```
++
+. Compile your project and run it. Observe the output in the console.
+
+
+
+
+

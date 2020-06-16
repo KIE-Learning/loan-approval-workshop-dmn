@@ -5,7 +5,7 @@
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.8">
-<title>Red Hat Process Automation Manager Workshop</title>
+<title>Red Hat Process Automation Manager Workshop - DMN</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -435,20 +435,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_red_hat_process_automation_manager_workshop">Red Hat Process Automation Manager Workshop</a></li>
+<li><a href="#_red_hat_process_automation_manager_workshop_dmn">Red Hat Process Automation Manager Workshop - DMN</a></li>
 <li><a href="#_problem_statement">1. Problem Statement</a></li>
 <li><a href="#_create_a_project">2. Create a Project</a></li>
 <li><a href="#_solution">3. Solution</a>
 <ul class="sectlevel2">
 <li><a href="#_the_domain_model">3.1. The Domain Model</a></li>
-<li><a href="#_creating_the_age_pre_qualification_decision">3.2. Creating the Age Pre-Qualification Decision</a></li>
-<li><a href="#_creating_the_interest_calculation">3.3. Creating the Interest Calculation</a></li>
-<li><a href="#_creating_the_loan_pre_qualification_decision">3.4. Creating the Loan Pre Qualification Decision</a></li>
-<li><a href="#_creating_the_loan_approval_workflow">3.5. Creating the Loan Approval Workflow</a></li>
-<li><a href="#_creating_the_user_forms">3.6. Creating the User Forms</a></li>
-<li><a href="#_process_management_and_tracking">3.7. Process Management and Tracking</a></li>
-<li><a href="#_interacting_with_the_kie_server_apis">3.8. Interacting with the Kie-Server APIs</a></li>
-<li><a href="#_using_the_kie_server_client">3.9. Using the Kie-Server Client</a></li>
+<li><a href="#_creating_the_decision_flow">3.2. Creating the Decision Flow</a></li>
+<li><a href="#_testing_the_dmn">3.3. Testing the DMN</a></li>
+<li><a href="#_testing_the_dmn_using_rest_api">3.4. Testing the DMN using REST API</a></li>
+<li><a href="#_testing_the_dmn_using_java_apis">3.5. Testing the DMN using Java APIs</a></li>
 </ul>
 </li>
 </ul>
@@ -456,34 +452,28 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_red_hat_process_automation_manager_workshop">Red Hat Process Automation Manager Workshop</h2>
+<h2 id="_red_hat_process_automation_manager_workshop_dmn">Red Hat Process Automation Manager Workshop - DMN</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This workshop is aimed at providing hands on experience creating Decision and Process Assets. This lab will implement a Loan Approval workflow.</p>
+<p>This workshop is aimed at providing hands on experience creating DMN assets. This lab will implement a Loan Approval workflow.</p>
 </div>
 <div class="ulist">
 <div class="title">Goals</div>
 <ul>
 <li>
-<p>Define and create the process domain model using the platform&#8217;s Data Modeller.</p>
+<p>Define a Loan Pre Approval Decision flow using DMN</p>
 </li>
 <li>
-<p>Create an Age Pre-Qualification Decision using Guided Rules</p>
+<p>Test the DMN asset using the Test Scenario tooling</p>
 </li>
 <li>
-<p>Create an Interest Calculation decision using XLS Decision table.</p>
+<p>Build and deploy the DMN asset</p>
 </li>
 <li>
-<p>Create a Loan Pre-Qualification Decision using Guided Decision tables.</p>
+<p>Test the Decision execution using REST APIs</p>
 </li>
 <li>
-<p>Create a Loan Approval workflow.</p>
-</li>
-<li>
-<p>Create Task forms for human tasks.</p>
-</li>
-<li>
-<p>Deploying and Management of the Loan Approval Process</p>
+<p>Test the Decision execution using JAVA APIs</p>
 </li>
 </ul>
 </div>
@@ -495,7 +485,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 or</p>
 </li>
 <li>
-<p>An existing, accessible, DM/PAM 7.3+ environment.</p>
+<p>An existing, accessible, DM/PAM 7.5+ environment.</p>
 </li>
 </ul>
 </div>
@@ -514,9 +504,9 @@ or</p>
 </li>
 <li>
 <p>Age and Pre Qualification checks are applied to the loan request.</p>
-</li>
-<li>
-<p>If the pre-qualification was succesful, then the request is assigned to a loan manager for approval.</p>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN_img1.jpg" alt="DMN img1"></span></p>
+</div>
 </li>
 </ul>
 </div>
@@ -526,7 +516,7 @@ or</p>
 <h2 id="_create_a_project">2. Create a Project</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To define and deploy a business process, we first need to create a new project in which we can store the BPMN2 model, our domain model and the forms required for user interaction. To create a new project:</p>
+<p>To define and deploy a business process, we first need to create a new project in which we can store the DMN model. To create a new project:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -616,22 +606,17 @@ In this lab, we collect two types of data:</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">age</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Age</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">creditScore</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Credit Score</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Integer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">monthlyIncome</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Monthly Income</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Double</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">yearlyIncome</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Yearly Income</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Double</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">double</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">name</p></td>
@@ -640,13 +625,6 @@ In this lab, we collect two types of data:</p>
 </tr>
 </tbody>
 </table>
-</li>
-<li>
-<p>When you&#8217;ve added the fields, save the data object by clicking on the <em>Save</em> button in the top menu.
-After creation the <code>Applicant</code> Model should look like this.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/applicant_overview.jpg" alt="applicant overview"></span></p>
-</div>
 </li>
 <li>
 <p>Use the _breadcrumb navigator at the top-left of the screen to navigate back to our <code>loan-approval</code> project.</p>
@@ -684,47 +662,12 @@ After creation the <code>Applicant</code> Model should look like this.</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">duration</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Duration</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Integer</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">interestRate</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Interest Rate</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Double</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">monthlyRepayment</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Monthly Repayment</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Double</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">agePreQual</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Age PreQualification</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">loanPreQualification</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Loan PreQualification</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">boolean</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">comment</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">comment</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">String</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p>When you&#8217;ve added the fields, save the data object by clicking on the <em>Save</em> button in the top menu.
-After creation the <code>Applicant</code> Model should look like this.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/loan_obj_save.jpg" alt="loan obj save"></span></p>
-</div>
-<div class="paragraph">
 <p>We&#8217;re done creating our data model.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/assets_lib.jpg" alt="assets lib"></span></p>
 </div>
 </li>
 </ol>
@@ -733,1072 +676,805 @@ After creation the <code>Applicant</code> Model should look like this.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>We can now create the required decisions for our process.</p>
+<p>We can now create the required decisions using DMN.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_creating_the_age_pre_qualification_decision">3.2. Creating the Age Pre-Qualification Decision</h3>
+<h3 id="_creating_the_decision_flow">3.2. Creating the Decision Flow</h3>
 <div class="paragraph">
-<p>First let us create a simple Age Pre Qualification decision. The rule will do a simple check to ensure the Applicant&#8217;s age is between 18 and 70.</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Click on the <em>Add Asset</em> button and choose the <code>Guided Rule</code> asset. Name it <code>AgePreQualification</code>.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/age_pre_qual_create.jpg" alt="age pre qual create"></span></p>
+<p>We will now define the decision logic using DMN.</p>
 </div>
 <div class="quoteblock">
 <blockquote>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Guided Rules are suited for individual rules that can be created in a UI-based rule designer in Decision Central</p>
-</li>
-<li>
-<p>Provide fields and options for acceptable input</p>
-</li>
-<li>
-<p>Are optimal for creating single rules in a controlled format to minimize compilation errors</p>
-</li>
-</ol>
+<div class="paragraph">
+<p>Decision Model and Notation (DMN) is a standard established by the Object Management Group (OMG) for describing and modeling operational decisions. DMN defines an XML schema that enables DMN models to be shared between DMN-compliant platforms and across organizations so that business analysts and business rules developers can collaborate in designing and implementing DMN decision services. Check out the followng documentation to understand more about the DMN elements. <a href="https://access.redhat.com/documentation/en-us/red_hat_decision_manager/7.7/html/designing_a_decision_service_using_dmn_models/dmn-con_dmn-models" class="bare">https://access.redhat.com/documentation/en-us/red_hat_decision_manager/7.7/html/designing_a_decision_service_using_dmn_models/dmn-con_dmn-models</a></p>
 </div>
 </blockquote>
 </div>
-</li>
+<div class="olist arabic">
+<ol class="arabic">
 <li>
-<p>When the Guided edior opens up, click on the + icon on the right corner of the editor screen.</p>
+<p>Click on the <em>Add Asset</em> button and choose the <code>DMN</code> asset. Name it <code>loan-approval-dmn</code>.</p>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step1.jpg" alt="guided rule step1"></span></p>
-</div>
-<div class="paragraph">
-<p>Let us first import the <code>Applicant</code> Object as below.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step2.jpg" alt="guided rule step2"></span></p>
+<p><span class="image"><img src="images/loan-approval-dmn.jpg" alt="loan approval dmn"></span></p>
 </div>
 </li>
 <li>
-<p>Now again click on the first green + icon as we did in the previous step and choose the <code>Loan</code> Object.</p>
+<p>When the DMN editor opens ups, inspect the editor. There are four main sections on the editor.</p>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step3.jpg" alt="guided rule step3"></span></p>
+<p><span class="image"><img src="images/DMN_editor_view.jpg" alt="DMN editor view"></span></p>
 </div>
 <div class="paragraph">
-<p>We have imported the required input objects.</p>
+<p><strong>Decision Navigator</strong>: shows the nodes used in the Decision Requirements Diagram (DRD, the diagram), and the decisions behind the nodes. Allows for quick navigation through the model.</p>
 </div>
-</li>
-<li>
-<p>Next, click on step 1</p>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step4.jpg" alt="guided rule step4"></span></p>
+<p><strong>Decision Requirements Diagram Editor</strong>: the canvas in which the model can be created.</p>
 </div>
-</li>
-<li>
-<p>Select the <em>All of (And)</em> option in the Multiple field constraint field.</p>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step5.jpg" alt="guided rule step5"></span></p>
+<p><strong>Palette</strong>: Contains all the DMN constructs that can be used in a DRD, e.g. Input Node, Decision Node, etc.</p>
+</div>
+<div class="paragraph">
+<p><strong>Property Panel</strong>: provides access to the properties of the model (name, namespace, etc), nodes, etc.</p>
 </div>
 </li>
 <li>
-<p>Next we will add the conditions. For this click on the <em>all of the following:</em> displayed below the <code>Applicant</code> Object.
-<span class="image"><img src="images/guided_rule_step6.jpg" alt="guided rule step6"></span></p>
-</li>
-<li>
-<p>We will add the conditions now. We would need the age to be greater than 18 and less than 82. Let us do that by selecting age from the <em>Add a restriction on a field</em> drop down.</p>
+<p>Let us include the required Data Objects that we need for the DMN. Click on the Data Types tab on the canvas.</p>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step7.jpg" alt="guided rule step7"></span></p>
+<p><span class="image"><img src="images/DMN-step-2.jpg" alt="DMN step 2"></span></p>
+</div>
+<div class="paragraph">
+<p>Click on the <code>Add a custom Data Type</code> button on the canvas. Now choose the option to <code>Import Data Object</code>.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-3.jpg" alt="DMN step 3"></span></p>
+</div>
+<div class="paragraph">
+<p>Now choose the <code>Applicant</code> and <code>Loan</code> Objects and click on Import.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-4.jpg" alt="DMN step 4"></span></p>
+</div>
+<div class="paragraph">
+<p>Once that is imported, we finally create a result object. For this edit the new data type which was just created. We will define this as a Structure type.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-5.jpg" alt="DMN step 5"></span></p>
+</div>
+<div class="paragraph">
+<p>Click on the tick mark on the right side to save the changes. Next we will add the fields for the Structure. As you click on save, the first field is automatically created. Edit the name and the data type as shown below and click on the tick mark to save the changes.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-6.jpg" alt="DMN step 6"></span></p>
+</div>
+<div class="paragraph">
+<p>Let us now add a new field, for this click on the <code>+</code> button on the Structure as shown below.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-7.jpg" alt="DMN step 7"></span></p>
+</div>
+<div class="paragraph">
+<p>We will make this field as list of strings.
+Edit the name and data type and click on the tick mark to save the changes.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-29.jpg" alt="DMN step 29"></span></p>
+</div>
+<div class="paragraph">
+<p>Click on save on the DMN editor to save the changes.</p>
 </div>
 </li>
 <li>
-<p>This should add the age field on the editor
-Now select the <em>greater than</em> option from the drop down and click on the small pencil icon next to the drop down.</p>
+<p>Let us now build the decision graph. Drag and drop the Input element (Rounded Rectangle) from the <code>Palette</code> on to the <code>canvas</code>.</p>
+<div class="quoteblock">
+<blockquote>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step8.jpg" alt="guided rule step8"></span></p>
+<p>Information used in a decision node or a business knowledge model. Input data usually includes business-level concepts or objects relevant to the business, such as loan applicant data used in a lending strategy.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-1.jpg" alt="DMN step 1"></span></p>
+</div>
+<div class="paragraph">
+<p>The element can be renamed either by double clicking within the element or by editing the properties from the right side property pane. Click on the element, and the properties for the element should be shown on the right. Let us edit the name as data type of the element as shown below.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-9.jpg" alt="DMN step 9"></span></p>
+</div>
+<div class="paragraph">
+<p>Similarly, let us define the next Input element which is <code>Loan</code>.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-10.jpg" alt="DMN step 10"></span></p>
 </div>
 </li>
 <li>
-<p>We will enter 18 here to indicate the condition, similarly we will add a condition for less than 70 as well.</p>
+<p>Next let us define the decision elements. Drag drop the Decision element(Rectangle) on to the canvas.</p>
+<div class="quoteblock">
+<blockquote>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step9.jpg" alt="guided rule step9"></span></p>
+<p>Node where one or more input elements determine an output based on defined decision logic.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-11.jpg" alt="DMN step 11"></span></p>
+</div>
+<div class="paragraph">
+<p>Next let us define, a second Decision element (Rectangle) for Pre Qualification.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-12.jpg" alt="DMN step 12"></span></p>
 </div>
 </li>
 <li>
-<p>Next let us click on the 2nd Step which is <em>There is a Loan</em>.</p>
+<p>Let&#8217;s say the <code>Debt to Income</code> calculation is repeatable and we want to create it as a Function. For this let us create a BKM. (Business Knowledge Model)</p>
+<div class="quoteblock">
+<blockquote>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step11.jpg" alt="guided rule step11"></span></p>
+<p>Reusable function with one or more decision elements. Decisions that have the same logic but depend on different sub-input data or sub-decisions use business knowledge models to determine which procedure to follow.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-13.jpg" alt="DMN step 13"></span></p>
+</div>
+<div class="paragraph">
+<p>Click on save on the DMN editor to save the changes.</p>
 </div>
 </li>
 <li>
-<p>We will enter an alias for this Loan object as below and click on <em>Set</em></p>
+<p>Next let us connect these various nodes.</p>
+<div class="quoteblock">
+<blockquote>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step12.jpg" alt="guided rule step12"></span></p>
+<p>Connection from an input data node or decision node to another decision node that requires the information.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>The <code>Interest Rate</code> Decision will be based on the Loan information, so let us first connect the <code>Loan</code> input element to the <code>Interest Rate</code> decision. Click on the arrow around the Input element for the connector. Pull the arrow on to the Decision element.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-14.jpg" alt="DMN step 14"></span></p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-15.jpg" alt="DMN step 15"></span></p>
+</div>
+<div class="paragraph">
+<p>Next the <code>PreQualification</code> decision depends on the <code>Applicant</code> and the <code>Loan</code> input elements. Let us connect these arrows.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-16.jpg" alt="DMN step 16"></span></p>
+</div>
+<div class="paragraph">
+<p>We will use the <code>Interest Rate</code> in the Loan <code>PreQualification</code>. Lets connect these nodes.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-17.jpg" alt="DMN step 17"></span></p>
 </div>
 </li>
 <li>
-<p>Now we have finished defining all the conditions, let us now define the action. Let us click on the green icon to add the <em>Then</em> clause.</p>
+<p>Next we will connect the BKM. <code>Debt to Income</code> will be used by <code>PreQualification</code>. Let us connect these using the dotted arrow.</p>
+<div class="quoteblock">
+<blockquote>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step10.jpg" alt="guided rule step10"></span></p>
+<p>Connection from a business knowledge model to a decision node or to another business knowledge model that invokes the decision logic.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-18.jpg" alt="DMN step 18"></span></p>
+</div>
+<div class="paragraph">
+<p>Click on save on the DMN editor to save the changes. (Note that you can see errors while saving the changes, proceed with the save operation. Once we define the decisions the error should go away).</p>
 </div>
 </li>
 <li>
-<p>Here we will select the option for <em>Change field values of Loan</em></p>
+<p>Next let us start defining the decision logic. Let us first define the logic for the <code>Interest Rate</code> decision.</p>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step13.jpg" alt="guided rule step13"></span></p>
+<p>For this click on edit on the node <code>Interest Rate</code>.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-19.jpg" alt="DMN step 19"></span></p>
+</div>
+<div class="paragraph">
+<p>Now we will define the Decision type, the <code>Interest Rate</code> calculation will be a Decision table.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>A decision table in DMN is a visual representation of one or more business rules in a tabular format. You use decision tables to define rules for a decision node that applies those rules at a given point in the decision model.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-20.jpg" alt="DMN step 20"></span></p>
+</div>
+<div class="paragraph">
+<p>The Decision table should already pre-fill with the columns as shown below.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-21.jpg" alt="DMN step 21"></span></p>
+</div>
+<div class="paragraph">
+<p>Now fill up table as shown below.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-22.jpg" alt="DMN step 22"></span></p>
 </div>
 </li>
 <li>
-<p>Next let us click on the pencil icon to tell the editor which field to choose. We will choose the field <code>agePreQual</code> and choose ok. Subsequently we again choose the pencil icon next to the field and set the value as true. Your result should look like below.</p>
+<p>Next we will define the BKM for the <code>Debt to Income</code> calculation. For this click on the edit context icon on the node.</p>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step14.jpg" alt="guided rule step14"></span></p>
+<p><span class="image"><img src="images/DMN-step-23.jpg" alt="DMN step 23"></span></p>
+</div>
+<div class="paragraph">
+<p>Now Click on <code>Edit Parameters</code> and add parameters for the function.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-24.jpg" alt="DMN step 24"></span></p>
+</div>
+<div class="paragraph">
+<p>Next click on the <code>Select Expression</code> and add the formula for this calculation.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-25.jpg" alt="DMN step 25"></span></p>
+</div>
+<div class="paragraph">
+<p>We will define this as a <code>Context</code>.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>A boxed context expression in DMN is a set of variable names and values with a result value. Each name-value pair is a context entry. You use context expressions to represent data definitions in decision logic and set a value for a desired decision element within the DMN decision model.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>Choose the expression type to be <code>Context</code>. Now click on the Select Expression within the context as shown below and choose <code>Literal Expression</code></p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>A boxed literal expression in DMN is a literal FEEL expression as text in a table cell, typically with a labeled column and an assigned data type. You use boxed literal expressions to define simple or complex node logic or decision data directly in FEEL for a particular node in a decision.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-26.jpg" alt="DMN step 26"></span></p>
+</div>
+<div class="paragraph">
+<p>Define the formula as shown below.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-27.jpg" alt="DMN step 27"></span></p>
 </div>
 </li>
 <li>
-<p>Finally we will do one last thing here, since the rules are going to orchestrated using a business process, we will provide it an identifier called <em>Rule Flow Group</em>. For this click on the <em>show options</em> link.</p>
+<p>Finally let us define the logic for the <code>PreQualification</code> decision.</p>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step15.jpg" alt="guided rule step15"></span></p>
+<p>Save as keep adding each step (you may see validation errors, but they should all go away at the end).
+For this click on the edit context icon for the node, and choose <code>Context</code> as the Decision type.</p>
 </div>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step16.jpg" alt="guided rule step16"></span></p>
-</div>
-</li>
-<li>
-<p>We will choose the attribute <em>ruleflow-group</em> from the drop down and click on ok. We will enter <code>age_qualification</code> for the value of attribute.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step17.jpg" alt="guided rule step17"></span></p>
-</div>
-</li>
-<li>
-<p>We are all done now. We can now click on <em>Save</em> to save the rule and clicking on <em>Validate</em>. This should end up being succesful.</p>
-</li>
-<li>
-<p>Next let us setup a test for testing this rule artifact.</p>
-</li>
-<li>
-<p>For this go back to the asset library view, and choose the <em>Add Asset</em> button. We will choose the artifact type <em>Test Scenario</em>.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step18.jpg" alt="guided rule step18"></span></p>
-</div>
-</li>
-<li>
-<p>On the Test Scenario editor, we provide the <em>Given</em> and the <em>Then</em> clauses. On the right side pane we have the objects listed. Click on the Given Object type and choose the <code>Applicant</code> object from the right pane. We will choose the <code>age</code> field.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step19.jpg" alt="guided rule step19"></span></p>
-</div>
-</li>
-<li>
-<p>Now we will click on the <code>Applicant</code> column under <em>Given</em> and using the context option add a new column to the right. Here, we will choose <code>Loan</code>. Finally click on the <em>Then</em> column and add the object <code>Loan</code>. Here we will choose the field <code>agePreQual</code>.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step20.jpg" alt="guided rule step20"></span></p>
+<p><span class="image"><img src="images/DMN-step-28.jpg" alt="DMN step 28"></span></p>
 </div>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step21.jpg" alt="guided rule step21"></span></p>
+<p>Let us define the data type for Context as <code>loanPreApproval</code></p>
 </div>
-</li>
-<li>
-<p>Next let us inform the test editor which <em>Rule Flow Group</em> we are testing with. For this click on the settings option from the right side pane.</p>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step22.jpg" alt="guided rule step22"></span></p>
+<p><span class="image"><img src="images/DMN-step-32.jpg" alt="DMN step 32"></span></p>
 </div>
-</li>
-<li>
-<p>Enter the value for the Rule Flow Group as <code>age_qualification</code>.</p>
-</li>
-<li>
-<p>Now we can add values to the various columns by editing the cells similar to spread sheet editing.</p>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_rule_step23.jpg" alt="guided rule step23"></span></p>
+<p>We will define 3 types of Eligibility checks. First let us define <code>Age Check</code>. For this rename the context row as show below and choose the expression type as <code>Decision Table</code>.</p>
 </div>
-</li>
-<li>
-<p>Once done, click on the <em>Test</em> button to test the rules. As shown in the image above by clicking on the metrics option from the right side pane, we can see coverage reports show up as well. Finally save the artifact.</p>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-30.jpg" alt="DMN step 30"></span></p>
+</div>
+<div class="paragraph">
+<p>Edit the input column to check for <code>Applicant</code> age.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-31.jpg" alt="DMN step 31"></span></p>
+</div>
+<div class="paragraph">
+<p>Now define the output column&#8217;s data type as <code>loanPreApproval</code>. We will need to define the <code>preApproval</code> and  <code>reason</code> fields of the result object. For this, click on the column and right click to add rows to the left.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-33.jpg" alt="DMN step 33"></span></p>
+</div>
+<div class="paragraph">
+<p>Now change the main column header&#8217;s data type as show in the below image to be <code>loanPreApproval</code>.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-34.jpg" alt="DMN step 34"></span></p>
+</div>
+<div class="paragraph">
+<p>Rename and edit type for the column underneath for <code>preApproval</code></p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-35.jpg" alt="DMN step 35"></span></p>
+</div>
+<div class="paragraph">
+<p>Rename and edit type for the column underneath for <code>reason</code></p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-36.jpg" alt="DMN step 36"></span></p>
+</div>
+<div class="paragraph">
+<p>Now add the decision row as shown in the image.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-37.jpg" alt="DMN step 37"></span></p>
+</div>
+<div class="paragraph">
+<p>We will insert the next row for <code>Credit Check</code>. For this click on the context row and right click to add a new row.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-38.jpg" alt="DMN step 38"></span></p>
+</div>
+<div class="paragraph">
+<p>Rename the context row and set the data type as we did for the  <code>Age Eligibility</code>.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-39.jpg" alt="DMN step 39"></span></p>
+</div>
+<div class="paragraph">
+<p>We will again define a decision table</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-40.jpg" alt="DMN step 40"></span></p>
+</div>
+<div class="paragraph">
+<p>Now set the input column to now read the credit score from the <code>Applicant</code> object.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-41.jpg" alt="DMN step 41"></span></p>
+</div>
+<div class="paragraph">
+<p>Like we did for the previous conext row, set the output column to be <code>loanPreApproval</code>. Now define the rule as below.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-42.jpg" alt="DMN step 42"></span></p>
+</div>
+<div class="paragraph">
+<p>We will now define <code>Debt Ratio Check</code>, for this we first need to invoke the Function (BKM) we created. Create a new context row.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-43.jpg" alt="DMN step 43"></span></p>
+</div>
+<div class="paragraph">
+<p>On the expression type select <code>Invocation</code>.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-44.jpg" alt="DMN step 44"></span></p>
+</div>
+<div class="paragraph">
+<p>Define the name of the function <code>Debt to Income</code> and start defining the parameters for the BKM.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-45.jpg" alt="DMN step 45"></span></p>
+</div>
+<div class="paragraph">
+<p>For this choose the Literal expression type and define the value.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-46.jpg" alt="DMN step 46"></span></p>
+</div>
+<div class="paragraph">
+<p>Similarly define all the parameters for the BKM, by right clicking on the parameter row and adding rows.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-47.jpg" alt="DMN step 47"></span></p>
+</div>
+<div class="paragraph">
+<p>Now that we have invoked the function, lets create a new context row for the <code>Debt Ratio Check</code>.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-48.jpg" alt="DMN step 48"></span></p>
+</div>
+<div class="paragraph">
+<p>Define the expression type as Decision table as we did for the earlier checks and define the rule as below.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-49.jpg" alt="DMN step 49"></span></p>
+</div>
+<div class="paragraph">
+<p>Finally lets combine the results of all these checks. For this create a new context row and name it preApprovalStatus. We will add the expression type as Literal Expression and we will define a FEEL expression that combines the preApproval status from all of the previous checks.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-50.jpg" alt="DMN step 50"></span></p>
+</div>
+<div class="paragraph">
+<p>Similarly, let us also define a FEEL expression for combining the reason string for each of the checks.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-51.jpg" alt="DMN step 51"></span></p>
+</div>
+<div class="paragraph">
+<p>Finally return the combined value for the Context.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-52.jpg" alt="DMN step 52"></span></p>
+</div>
 </li>
 </ol>
-</div>
-<div class="paragraph">
-<p>Congratulations! We have now created our first artifact.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_creating_the_interest_calculation">3.3. Creating the Interest Calculation</h3>
+<h3 id="_testing_the_dmn">3.3. Testing the DMN</h3>
+<div class="paragraph">
+<p>Now that we have finished creating the DMN asset, let us test the decisions. For this go back to the asset library and add a Test Scenario asset. Choose the DMN from the drop and save.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-53.jpg" alt="DMN step 53"></span></p>
+</div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>We will now use another authoring format to create the Interest Rate Calculation table.</p>
-<div class="quoteblock">
-<blockquote>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Uploaded Decision tables are XLS or XLSX decision table spreadsheets that you upload into Decision Central</p>
-</li>
-<li>
-<p>Support template keys and values for creating rule templates</p>
-</li>
-<li>
-<p>Are optimal for creating rules in decision tables already managed outside of Decision Central
-Have strict syntax requirements for rules to be compiled properly when uploaded</p>
-</li>
-</ol>
-</div>
-</blockquote>
+<p>The Test Scenario should prepopulate the column names corresponding to our input elements.</p>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-54.jpg" alt="DMN step 54"></span></p>
 </div>
 <div class="paragraph">
-<p>Spreadsheets require two key areas that define rule data: a RuleSet area and a RuleTable area. The RuleSet area of the spreadsheet defines elements that you want to apply globally to all rules in the same package (not only the spreadsheet), such as a rule set name or universal rule attributes. The RuleTable area defines the actual rules (rows) and the conditions, actions, and other rule attributes (columns) that constitute that rule table within the specified rule set. A decision table spreadsheet can contain multiple RuleTable areas, but only one RuleSet area.</p>
+<p>Now let us define a sample test set</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-55.jpg" alt="DMN step 55"></span></p>
+</div>
+<div class="paragraph">
+<p>Click on the play button, the Test should be successful. Note that we havent yet defined the <code>reason</code> string in the action column.</p>
 </div>
 </li>
 <li>
-<p>For the purpose of this excercise, you can download the template available here.</p>
+<p>The <code>reason</code> column is a list of string, and can contain a list of error messages pertaining to the evaluation. Lets now double click on the reason column cell. It opens up a editor to add list elements.</p>
 <div class="paragraph">
-<p><a href="resources/interest_rate_calculation.xls">Interest Rate calculation</a></p>
-</div>
-<div class="paragraph">
-<p>Your spread sheet should look like this.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/spread_sheet_1.jpg" alt="spread sheet 1"></span></p>
+<p><span class="image"><img src="images/DMN-step-56.jpg" alt="DMN step 56"></span></p>
 </div>
 </li>
 <li>
-<p>Let us now inspect the values. The ruleset section defines the <em>Rule Set name</em>, the <em>Rule Flow Group</em> and import to specify the object which we will be making use of(which in this case is <code>Loan</code>).</p>
+<p>Choose the option to Create List, and click on <code>+ Add new item</code></p>
 <div class="paragraph">
-<p>The condition columns define the logic for identifying the Interest Rate. We also calculate the Monthly Repayment based on the amount.</p>
+<p>Enter the value for the list element as shown below and click on Save.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-57.jpg" alt="DMN step 57"></span></p>
+</div>
+<div class="paragraph">
+<p>Now click on Test and it should be succesful.</p>
 </div>
 </li>
 <li>
-<p>Let us now define the values <em>RuleTable</em> as below.  Edit the downloaded spread sheet and enter these values.</p>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-<col style="width: 25%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Min Amount</th>
-<th class="tableblock halign-left valign-top">Max Amount</th>
-<th class="tableblock halign-left valign-top">Duration(years)</th>
-<th class="tableblock halign-left valign-top">Interest Rate</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">7</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.47</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">600000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">7</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.70</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">600000</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">7</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.98</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.72</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">600000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0.90</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">600000</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">10</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.10</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">20</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.25</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">300000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">600000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">20</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.39</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">600000</p></td>
-<td class="tableblock halign-left valign-top"></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">20</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">1.65</p></td>
-</tr>
-</tbody>
-</table>
+<p>Inspect the Coverage Reports from the right side pane to see the decisions fired as a part of the rule set.</p>
 <div class="paragraph">
-<p>Once done, we will upload it to Business Central</p>
-</div>
-</li>
-<li>
-<p>Now select the <em>Add Asset</em> button from the asset libary page and choose Decision Table(Spreadsheet)</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/spread_sheet_2.jpg" alt="spread sheet 2"></span></p>
-</div>
-<div class="paragraph">
-<p>select the file which we edited in the previous step. This should create the artifact succesfully.</p>
+<p><span class="image"><img src="images/DMN-step-58.jpg" alt="DMN step 58"></span></p>
 </div>
 </li>
 </ol>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_creating_the_loan_pre_qualification_decision">3.4. Creating the Loan Pre Qualification Decision</h3>
+<h3 id="_testing_the_dmn_using_rest_api">3.4. Testing the DMN using REST API</h3>
 <div class="paragraph">
-<p>Now we will do a Loan Pre Qualification check based on the loan amount, Debt Ratio and Credit Score.</p>
+<p>For testing the DMN using REST APIs we will first build and deploy the DMN project. On the project landing page, click on <code>Deploy</code> button.</p>
 </div>
 <div class="paragraph">
-<p>We will now use the <em>Guided Decision Table</em> asset.</p>
+<p>Let us now use the Kie Server API endpoint for testing the DMN decisions.</p>
 </div>
-<div class="quoteblock">
-<blockquote>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Guided Decison are rules that you create in a UI-based table designer in Decision Central</p>
-</li>
-<li>
-<p>Are a wizard-led alternative to uploaded decision table spreadsheets</p>
-</li>
-<li>
-<p>Provide fields and options for acceptable input</p>
-</li>
-</ol>
+<div class="paragraph">
+<p>Open up the Kie Server Swagger endpoint. Go to the DMN models section.</p>
 </div>
-</blockquote>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-59.jpg" alt="DMN step 59"></span></p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Now go back to the asset library and click on <em>Add Asset</em> button. Choose the Guided Decision Table option.</p>
+<p>Expand the POST operation and click on the Try it out button</p>
 <div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_1.jpg" alt="guided dtable 1"></span></p>
-</div>
-<div class="quoteblock">
-<blockquote>
-<div class="paragraph">
-<p>Hit policies determine the order in which rules (rows) in a guided decision table are applied, whether top to bottom, per specified priority, or other options.</p>
-</div>
-</blockquote>
+<p>Set the containerId field to <code>DMNWorkshop_1.0.0-SNAPSHOT</code> . Set the Parameter content type and Response content type fields to <code>application/json</code></p>
 </div>
 <div class="paragraph">
-<p>For this example, we will leave it as the default selection.</p>
-</div>
-<div class="paragraph">
-<p>Guided Decision tables provide wizard based approach to defining condition and action columns.</p>
-</div>
-<div class="paragraph">
-<p>On the Guided Decision Table editor click on the Columns Tab.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_2.jpg" alt="guided dtable 2"></span></p>
-</div>
-</li>
-<li>
-<p>First we will define a condition column to check for Min Loan Amount check. To Add a condition colum click on the <em>Insert Column</em> button. This will open up the wizard. Choose the <em>Add a Condition</em> option and click on <em>Next</em></p>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_3.jpg" alt="guided dtable 3"></span></p>
-</div>
-<div class="paragraph">
-<p>First we need to import the data objects which we will be using for the rule. For this click on the <em>Create a new Fact Pattern</em> button.</p>
-</div>
-<div class="paragraph">
-<p>Choose the <code>Loan</code> type and provide a binding variable. This is required so that we can start defining condition and action columns based on the <em>Loan</em> object.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_4.jpg" alt="guided dtable 4"></span></p>
-</div>
-<div class="paragraph">
-<p>Next let us define the Calculation type, we will choose the <em>Literal Value</em> and proceed.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_5.jpg" alt="guided dtable 5"></span></p>
-</div>
-<div class="paragraph">
-<p>We will choose the amount field.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_6.jpg" alt="guided dtable 6"></span></p>
-</div>
-<div class="paragraph">
-<p>Since we need to define the Min Amount check, we will choose the operation as <code>greater than</code> and proceed.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_7.jpg" alt="guided dtable 7"></span></p>
-</div>
-<div class="paragraph">
-<p>Finally we will give the column a header name and save the column definition.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_8.jpg" alt="guided dtable 8"></span></p>
-</div>
-</li>
-<li>
-<p>Next we will define the Max Loan Amount column, repeat the same steps as above but choose the operation type as <code>less than</code> instead.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_20.jpg" alt="guided dtable 20"></span></p>
-</div>
-</li>
-<li>
-<p>Next let us define the Debt ratio.</p>
-<div class="paragraph">
-<p>Since Debt Ratio is a calculation based on the Applicant&#8217;s data. We will need to import the <code>Applicant</code> type and create a binding.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_9.jpg" alt="guided dtable 9"></span></p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_10.jpg" alt="guided dtable 10"></span></p>
-</div>
-<div class="paragraph">
-<p>We will use the <em>Predicate</em> option and proceed.</p>
-</div>
-<div class="paragraph">
-<p>Enter the formula in the predicate field followed by <code>$param</code>. This will mean that
-the evaulation of the Formula provided will be checked against the condition defined on the column and will evaluate to True/False.</p>
-</div>
-<div class="paragraph">
-<p>The Debt ratio uses the <code>monthlyRepaymentAmount</code> as calculated in the XLS spread sheet decision table with this formula:</p>
+<p>Pass the following request to lookup the Loan PreQualification decision(note that the namespace of your model is probably different as it is generated. You can lookup the namespace of your model in the response/result of the GET operation you executed ealier, which returned the model description).</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>100*(loan.getMonthlyRepayment()/this.getMonthlyIncome()) $param</pre>
-</div>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_11.jpg" alt="guided dtable 11"></span></p>
-</div>
-<div class="paragraph">
-<p>We will proceed along the wizard with default values and finally define a Header description.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_12.jpg" alt="guided dtable 12"></span></p>
-</div>
-</li>
-<li>
-<p>Next we will need to create two columns for Max Credit Score and Min Credit Score. <code>creditScore</code> is a field in the <code>Applicant</code> Object. Follow the pattern we did for defining the Max and Min Loan Amount to define these columns.</p>
-</li>
-<li>
-<p>Now we need to define the <em>Action</em> columns. For this click on <em>Insert Column</em> and choose the value <em>Set the value of a field</em> and hit next.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_13.jpg" alt="guided dtable 13"></span></p>
-</div>
-<div class="paragraph">
-<p>We will set the value of <code>loanPreQualification</code> in the <code>Loan</code> Object.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_14.jpg" alt="guided dtable 14"></span></p>
-</div>
-<div class="paragraph">
-<p>Follow along the rest of the field with default values and define a header description.</p>
-</div>
-</li>
-<li>
-<p>We will define one more field which will provide reason for qualification/disqualification. For this click on <em>Insert Column</em> option and choose the <em>Insert Column</em> option. Choose the field <code>comment</code> of the <code>Loan</code> Object and proceed. We will define an allowed set of values to provide a pre-filled drop down on the guided decision table editor.</p>
-<div class="listingblock">
-<div class="content">
-<pre>"insufficient credit score","sufficient credit score","debt ratio too low","amount too low","amount too high"</pre>
-</div>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_15.jpg" alt="guided dtable 15"></span></p>
-</div>
-<div class="paragraph">
-<p>Proceed along the editor with default values and define a header for the field and finsih saving the action column definition.</p>
-</div>
-</li>
-<li>
-<p>We will need to define the <em>Rule Flow Group</em> for the rule definition that we created here. For this, click on <em>Insert Column</em>, check the box <em>Include advanced options</em> and and click on <em>Add an Attribute column</em>. Select the <em>Ruleflow-Group</em> option and click on <em>Finish</em>. Expand the <em>Attribute Coumns</em> and define the value for the <code>ruleflow-group</code> as below.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_19.jpg" alt="guided dtable 19"></span></p>
-</div>
-</li>
-<li>
-<p>Switch back to the Model Tab and finally our table should look like this.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_16.jpg" alt="guided dtable 16"></span></p>
-</div>
-</li>
-<li>
-<p>We will now enter the values for the decision table. For this click on the Insert button on the top right and click on <em>Append row</em></p>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_21.jpg" alt="guided dtable 21"></span></p>
-</div>
-</li>
-<li>
-<p>Fill in the table values as given below. Notice that for the Reason Column the value is available as a drop down and the Loan Pre Qualification column shows up as check box because of its boolean nature.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_17.jpg" alt="guided dtable 17"></span></p>
-</div>
-</li>
-<li>
-<p>Now Save the decision and click on <em>Validate</em>. To test the decision, let us import a <em>Test Scenario</em> which we have created already.
-Download the test file from here.</p>
-<div class="paragraph">
-<p><a href="resources/TestPreQualification.scesim">Test Pre Qualification</a></p>
-</div>
-<div class="paragraph">
-<p>Click on the <em>Import Asset</em> and choose this file.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/guided_dtable_18.jpg" alt="guided dtable 18"></span></p>
-</div>
-<div class="paragraph">
-<p>Now Click on <em>Test</em> to ensure they are no errors.
-Congratulations! We have now created all of the decisions needed for our process flow.</p>
-</div>
-</li>
-</ol>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_creating_the_loan_approval_workflow">3.5. Creating the Loan Approval Workflow</h3>
-<div class="paragraph">
-<p>Now that we have created all necessary pieces, we will now define the process. We will be building the following process flow.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_complete_1.jpg" alt="process complete 1"></span></p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>First let us click on the <em>Add Asset</em> button and choose the <em>Business Process</em> type.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_1.jpg" alt="process 1"></span></p>
-</div>
-</li>
-<li>
-<p>When the process designer opens, click on the properties pane to open it up.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_designer_pen_aid.jpg" alt="process designer pen aid"></span></p>
-</div>
-</li>
-<li>
-<p>Scroll down in the property panel on the right side of the screen, until you see the section <em>Process Data</em>.</p>
-</li>
-<li>
-<p>Expand the <em>Process Data</em> section and add the following 3 <em>Process Variables</em> by clicking on the <em>+</em> sign.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_2.jpg" alt="process 2"></span></p>
-</div>
-</li>
-<li>
-<p>Next let us define the steps one by one. We will start off with <em>Age Pre-Qualification</em>. For this we will need to choose the <em>Business Rule</em> node. Click on the left side process palette on the Task(Rectangle) option and drag drop the node on to the canvas.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_3.jpg" alt="process 3"></span></p>
-</div>
-<div class="paragraph">
-<p>Now click on the node and edit the properties on the right side pane. We will give it a name and rule flow group as below.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_5.jpg" alt="process 5"></span></p>
-</div>
-<div class="paragraph">
-<p>Next we will define the Inputs/Ouputs for the Rule. For this scroll down to the <em>Data Assignments</em> section and click on the Assignments. We will map the <code>Loan</code> and the <code>Applicant</code> types as input and the <code>Applicant</code> as output.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_4.jpg" alt="process 4"></span></p>
-</div>
-<div class="paragraph">
-<p>Next click on the Green circle(start node) and pull an arrow on to the <em>Business Rule</em> node. To connect click on the node and choose the context help displayed around the node to choose the arrow as shown below.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_12.jpg" alt="process 12"></span></p>
-</div>
-</li>
-<li>
-<p>Next we need to define a gateway to filter only applicants with succesful Age Pre Qualification check. Click on the Rhombus from the process palette(on the left) and choose the Exclusive.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_6.jpg" alt="process 6"></span></p>
-</div>
-</li>
-<li>
-<p>Next we will need to invoke the Interest Rate calculation on the Loan data. For this click on the <em>Task</em> node from the process palette(on the left) and choose the <em>Business Rule</em> node.</p>
-<div class="paragraph">
-<p>We will edit the name and add the Rule Flow group as below.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_7.jpg" alt="process 7"></span></p>
-</div>
-<div class="paragraph">
-<p>We will add the Assignment as we did in the previous step with the following definition.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_8.jpg" alt="process 8"></span></p>
-</div>
-</li>
-<li>
-<p>We will also choose the Red circle from the process palette(on the left) and choose the <em>End</em> event. Now we will connect the arrows between the <em>Age Pre-Qualification</em>, gateway and the <em>Interest Calculation</em> as below.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_9.jpg" alt="process 9"></span></p>
-</div>
-<div class="paragraph">
-<p>We will also need to define the logic for the gateway, for this click on the arrow to the <em>Interest Rate Calculation</em> and expand the <em>Implementation/Execution</em> section. Here we will define the logic as below.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_11.jpg" alt="process 11"></span></p>
-</div>
-<div class="paragraph">
-<p>Make sure to define the condition on the other path which connects to the <em>End</em> (red circle) as we did in the previous step.</p>
-</div>
-</li>
-<li>
-<p>Next we need to define the final rule for the Loan Pre Qualification check. Again drag and drop the <em>Business Rule</em> node on the canvas. Edit the name and choose the <em>Rule flow group</em> as <code>approval-rules</code>. We will define assignment for the rule as below.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_10.jpg" alt="process 10"></span></p>
-</div>
-<div class="paragraph">
-<p>Now connect the arrows.</p>
-</div>
-</li>
-<li>
-<p>Next we need to filter out all of the Loan Applications which failed the Pre Qualification. For this we will need to add another gateway. As we did earlier add a <em>Exclusive</em> gateway. We will connect one end of the gateway to the end signal.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_13.jpg" alt="process 13"></span></p>
-</div>
-</li>
-<li>
-<p>Last we will define a human task for the Loan Manager approval. For this click on the <em>Task</em> node from the process palette(on the left) and click on the <em>User</em> task. Drag drop the node on to the canvas.</p>
-<div class="paragraph">
-<p>We will edit the name and add the <em>Groups</em>. We will select <code>Administrators</code>.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_14.jpg" alt="process 14"></span></p>
-</div>
-<div class="paragraph">
-<p>Next scroll down to the <em>Assignments</em> section and add the following assignment.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_15.jpg" alt="process 15"></span></p>
-</div>
-</li>
-<li>
-<p>Finally connect the arrows and define the logic for the XOR gateway as below.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_16.jpg" alt="process 16"></span></p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_17.jpg" alt="process 17"></span></p>
-</div>
-</li>
-<li>
-<p>Finally click on <em>Validate</em> and it should be succesful.</p>
-</li>
-</ol>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_creating_the_user_forms">3.6. Creating the User Forms</h3>
-<div class="paragraph">
-<p>Next we will create User Forms to interact with the human tasks. We will set up one form to start the process and one for the Loan Manager Approval.</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>For this on the Process editor click on the following option and choose <code>Generate all Forms</code>.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_19.jpg" alt="process 19"></span></p>
-</div>
-<div class="paragraph">
-<p>This will create a form with all possible values, we will now edit these forms to make sure we have the right fields.</p>
-</div>
-</li>
-<li>
-<p>Go Back to the Asset Library view and filter by Forms. You should now see 4 forms generated.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_20.jpg" alt="process 20"></span></p>
-</div>
-<div class="paragraph">
-<p>The first two forms are generated for the <em>Data Objects</em> that we have for <em>Applicant</em> and <em>Form</em>. The third form is a Process start Form(used to kick-start a process) and the last is the User Task form(complete the user task).</p>
-</div>
-</li>
-<li>
-<p>Now open up the Form com_myspace_loan_approval_Applicant</p>
-<div class="paragraph">
-<p>You can see the various fields possible for an <code>Applicant</code>. Let us remove the field <code>Yearly Income</code> by clicking on the three dots on the right side of the field. You can also rearrange the fields as you see fit.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_21.jpg" alt="process 21"></span></p>
-</div>
-<div class="paragraph">
-<p>Save the changes.</p>
-</div>
-</li>
-<li>
-<p>Next let us open up the Form com_myspace_loan_approval_Loan</p>
-<div class="paragraph">
-<p>You can see the various fields possible for an _Loan. Let us remove the fields <code>Interest Rate</code>,<code>Monthly Repayment</code>,<code>Age PreQual</code>,<code>Loan PreQualification</code> and <code>Monthly Repayment</code> and <code>comment</code> by clicking on the three dots on the right side of the field. You can also rearrange the fields as you see fit.</p>
-</div>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_22.jpg" alt="process 22"></span></p>
-</div>
-</li>
-<li>
-<p>Now we will open up the Process Start Form
-loan-approval.loan-approval-wkflow-taskform
-Let us remove the fields <code>Approved</code> and click on <em>Save</em></p>
-</li>
-<li>
-<p>Finally let us open up the User Task Form - <code>Task-taskform</code> and make sure the fields look up.</p>
-</li>
-<li>
-<p>Now we are ready to build and deploy the changes. Go back to the asset library and click on <em>Deploy</em>. (The Deploy action Builds &amp; Deploys the changes).</p>
-</li>
-</ol>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_process_management_and_tracking">3.7. Process Management and Tracking</h3>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>After the build is succesful, click top menu option and choose <em>Process Definition</em>.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_24.jpg" alt="process 24"></span></p>
-</div>
-</li>
-<li>
-<p>We can see the Process Defintion listed, now click on the three dots on the right side of the Process <code>loan-approval-wkflow</code>. Click on <em>Start</em></p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_25.jpg" alt="process 25"></span></p>
-</div>
-</li>
-<li>
-<p>This should open up the Process Start Form.
-Enter the values for the form and proceed.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_26.jpg" alt="process 26"></span></p>
-</div>
-</li>
-<li>
-<p>We can now see the Process Instance View load up automatically.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_27.jpg" alt="process 27"></span></p>
-</div>
-<div class="paragraph">
-<p>Inspect the Process Summary</p>
-</div>
-</li>
-<li>
-<p>Click on the Diagram Tab on the Process Instance View.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_28.jpg" alt="process 28"></span></p>
-</div>
-<div class="paragraph">
-<p>You can see that the completed steps show up in grey color and the current task in progress shows up with a Red outline.</p>
-</div>
-</li>
-<li>
-<p>The task is assigned for a loan manager approval. If you remember, we assigned the Groups for the task as <code>Administrators</code>. By default the user you logged in with should have access to this task. To access this click on the top menu option and choose <code>Task Inbox</code>.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_29.jpg" alt="process 29"></span></p>
-</div>
-</li>
-<li>
-<p>Task Inbox shows up assigned tasks for the user. In this case we should see one task waiting to be worked on.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_30.jpg" alt="process 30"></span></p>
-</div>
-</li>
-<li>
-<p>Since it is assigned to a group, we first need to claim it. Open up the task and click on <em>Claim</em>.</p>
-</li>
-<li>
-<p>Now click on <em>Start</em>. We will approve the task by checking the <code>Approved</code> check  box. We will click <em>Complete</em>.  The task should now be completed. Let us go back to the Process Instance section by clicking the top Menu.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_31.jpg" alt="process 31"></span></p>
-</div>
-</li>
-<li>
-<p>Now let us inspect the completed instance by selecting the filter option as below.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_32.jpg" alt="process 32"></span></p>
-</div>
-</li>
-<li>
-<p>Click on the Process Variables tab and inspect the variables.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_33.jpg" alt="process 33"></span></p>
-</div>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>Since the <code>Applicant</code> and the <code>Loan</code> objects are custom java objects, it shows up as hashcode string. To display values so that it shows up on the Process Variables meaningfully, we can add a toString() method to the <code>Loan</code> object as below. If you make this change, make sure to Deploy the changes and start a new process to see the changes.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_35.jpg" alt="process 35"></span></p>
-</div>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>Finally we will inspect the Diagram tab on the Process Instance View. The path that the process took to completion is represented here.</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/process_34.jpg" alt="process 34"></span></p>
-</div>
-</li>
-</ol>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_interacting_with_the_kie_server_apis">3.8. Interacting with the Kie-Server APIs</h3>
-<div class="paragraph">
-<p>The Execution Server provides a rich RESTful API that allows user to interact with the process engine and deployed processes via a REST.
-This powerful feature allows users to create modern user interface and applications in their technology of choice (e.g. Entando DXP, ReactJS/Redux, AngularJS, etc.) and integrate these applications with the process engine to create modern, process driven, enterprise applications.</p>
-</div>
-<div class="paragraph">
-<p>The Swagger interface provides the description and documentation of the Execution Server’s RESTful API. At the same time, it allows the APIs to be called from the UI. This enables developers and users to quickly test a,in this case, a deployed business process.</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Navigate to the swagger page. The swagger endpoint is available in the following url:</p>
-<div class="paragraph">
-<p>KIE-Server-URL/docs</p>
-</div>
-</li>
-<li>
-<p>Locate the POST operation for the resource /server/containers/{containerId}/processes/{processId}/instances. This is the RESTful operation with which we can start a new process instance. Expand the operation:</p>
-<div class="paragraph">
-<p><span class="image"><img src="images/swagger_1.jpg" alt="swagger 1"></span></p>
-</div>
-</li>
-<li>
-<p>Click on the Try it out button.</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>Set the containerId to <code>loan-approval_1.0.0-SNAPSHOT</code></p>
-</li>
-<li>
-<p>Set the processId to <code>loan-approval.loan-approval-wkflow</code></p>
-</li>
-<li>
-<p>Set Parameter content type to <code>application/json</code></p>
-</li>
-<li>
-<p>Set the Response content type to <code>application/json</code></p>
-</li>
-<li>
-<p>Set the  body to:</p>
-<div class="listingblock">
-<div class="content">
-<pre>{
-  "applicant" : {
-    "com.myspace.loan_approval.Applicant" : {
-      "name" : "Mary",
-      "creditScore" : 750,
-      "monthlyIncome" :8000.0,
-      "age": 3
-    }
-  },
-  "loan" : {
-    "com.myspace.loan_approval.Loan" : {
-      "duration" : 7,
-      "amount":34000.0
+<pre class="highlight"><code>{
+  "model-namespace":"https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
+  "model-name":"loan-approval",
+  "dmn-context":{
+    "Applicant":{
+         "name":"Mary",
+         "age":23,
+         "creditScore":200,
+         "monthlyIncome":5600
+     },
+    "Loan": {
+         "amount":40000,
+         "duration":10
     }
   }
-}</pre>
+}</code></pre>
 </div>
 </div>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>Click on Execute.</p>
 <div class="paragraph">
-<p><span class="image"><img src="images/process_36.jpg" alt="process 36"></span></p>
+<p>Post call should be succesful. The response looks like this.</p>
 </div>
-</li>
-<li>
-<p>Go back to the Business Central workbench. Go the process instances view and inspect the process instance we have just started.</p>
-</li>
-<li>
-<p>The RESTful API provides many more operations. Let’s use the API to fetch our Task List and complete the <em>Loan Manager Approval</em> task. In the Swagger API, navigate to the Process queries section. Find the GET operation for the resource /server/queries/tasks/instances/pot-owners. Expand the operation and click on the Try it out button. Click on the Execute button. This will return all the tasks for our user</p>
-</li>
-<li>
-<p>We can see the <em>Loan Manager Approval</em> task that is available in our inbox. Let’s complete this task.</p>
-</li>
-<li>
-<p>Go to the Task Instances section in the Swagger interface and locate the PUT operation of the /server/containers/{containerId}/tasks/{taskInstanceId}/states/completed resource. This is the operation with which we can complete a task.</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>Set the containerId to <code>loan-approval_1.0.0-SNAPSHOT</code></p>
-</li>
-<li>
-<p>Set the taskInstanceId to the id of the task instance you want to complete. The task instance id can be found in the list of task instances we got back from our previous REST operation.</p>
-</li>
-<li>
-<p>Set auto-progress to true. This controls the auto progression of the taks through the various states of the task lifecycle (i.e. claimed, started, etc.).</p>
-</li>
-<li>
-<p>Set the Parameter content type to <code>application/json</code></p>
-</li>
-<li>
-<p>Set the Response content type to <code>application/json</code></p>
-</li>
-<li>
-<p>Set the body to:</p>
 <div class="listingblock">
 <div class="content">
-<pre>{
-   "approved":true
-}</pre>
+<pre class="highlight"><code>{
+  "type" : "SUCCESS",
+  "msg" : "OK from container 'DMNWorkshop_1.0.0-SNAPSHOT'",
+  "result" : {
+    "dmn-evaluation-result" : {
+      "messages" : [ {
+        "dmn-message-severity" : "WARN",
+        "message" : "No rule matched for decision table 'Age Eligibility' and no default values were defined. Setting result to null.",
+        "message-type" : "FEEL_EVALUATION_ERROR",
+        "source-id" : "_F999B6B9-1395-4C3D-BA41-63AC4851EE83"
+      } ],
+      "model-namespace" : "https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
+      "model-name" : "loan-approval",
+      "decision-name" : [ ],
+      "dmn-context" : {
+        "Interest Rate" : 1.45,
+        "Loan" : {
+          "duration" : 10,
+          "amount" : 40000
+        },
+        "PreQualification" : {
+          "reason" : [ "Credit too low" ],
+          "preApproval" : false
+        },
+        "Debt to Income" : "function Debt to Income( loanAmount, loanDuration, monthlyIncome, interestRate )",
+        "Applicant" : {
+          "creditScore" : 200,
+          "name" : "Mary",
+          "age" : 23,
+          "monthlyIncome" : 5600
+        }
+      },
+      "decision-results" : {
+        "_F999B6B9-1395-4C3D-BA41-63AC4851EE83" : {
+          "messages" : [ ],
+          "decision-id" : "_F999B6B9-1395-4C3D-BA41-63AC4851EE83",
+          "decision-name" : "PreQualification",
+          "result" : {
+            "reason" : [ "Credit too low" ],
+            "preApproval" : false
+          },
+          "status" : "SUCCEEDED"
+        },
+        "_784AD87C-DDFE-4CB6-8999-45EDA7C2A202" : {
+          "messages" : [ ],
+          "decision-id" : "_784AD87C-DDFE-4CB6-8999-45EDA7C2A202",
+          "decision-name" : "Interest Rate",
+          "result" : 1.45,
+          "status" : "SUCCEEDED"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Now we can see that all the decisions are executed. Lets say we want to execute only one of those decisions.</p>
+<div class="paragraph">
+<p>We will invoke the DMN call with decision name <code>Interest Rate</code></p>
+</div>
+<div class="paragraph">
+<p>Perform the POST request with the payload</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>{
+  "model-namespace":"https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
+  "model-name":"loan-approval",
+  "decision-name":"Interest Rate",
+  "decision-id":null,
+  "dmn-context":{
+    "Applicant":{
+         "name":"Mary",
+         "age":23,
+         "creditScore":200,
+         "monthlyIncome":5600
+     },
+    "Loan": {
+         "amount":40000,
+         "duration":10
+    }
+  }
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p><span class="image"><img src="images/process_37.jpg" alt="process 37"></span></p>
+<p>We can see that only the <code>Interest Rate</code> decision has been executed.</p>
 </div>
-</li>
-</ol>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>{
+  "type" : "SUCCESS",
+  "msg" : "OK from container 'DMNWorkshop_1.0.0-SNAPSHOT'",
+  "result" : {
+    "dmn-evaluation-result" : {
+      "messages" : [ ],
+      "model-namespace" : "https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
+      "model-name" : "loan-approval",
+      "decision-name" : "Interest Rate",
+      "dmn-context" : {
+        "Interest Rate" : 1.45,
+        "Loan" : {
+          "duration" : 10,
+          "amount" : 40000
+        },
+        "Applicant" : {
+          "creditScore" : 200,
+          "name" : "Mary",
+          "age" : 23,
+          "monthlyIncome" : 5600
+        }
+      },
+      "decision-results" : {
+        "_F999B6B9-1395-4C3D-BA41-63AC4851EE83" : {
+          "messages" : [ ],
+          "decision-id" : "_F999B6B9-1395-4C3D-BA41-63AC4851EE83",
+          "decision-name" : "PreQualification",
+          "result" : null,
+          "status" : "NOT_EVALUATED"
+        },
+        "_784AD87C-DDFE-4CB6-8999-45EDA7C2A202" : {
+          "messages" : [ ],
+          "decision-id" : "_784AD87C-DDFE-4CB6-8999-45EDA7C2A202",
+          "decision-name" : "Interest Rate",
+          "result" : 1.45,
+          "status" : "SUCCEEDED"
+        }
+      }
+    }
+  }
+}</code></pre>
+</div>
 </div>
 </li>
 </ol>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_using_the_kie_server_client">3.9. Using the Kie-Server Client</h3>
+<h3 id="_testing_the_dmn_using_java_apis">3.5. Testing the DMN using Java APIs</h3>
 <div class="paragraph">
-<p>Here is a take home assignment for using the Java Client to interact with the Kie-Server.</p>
+<p>Red Hat Decision Manager provides a KIE-Server Client API that allows the user to interact with the KIE-Server from a Java client using a higher level API. It abstracts the data marshalling and unmarshalling and the creation and execution of the RESTful commands from the developer, allowing him/her to focus on developing business logic.</p>
 </div>
 <div class="paragraph">
-<p>Red Hat Process Automation Manager provides a KIE-Server Client API that allows the user to interact with the KIE-Server from a Java client using a higher level API. It abstracts the data marshalling and unmarshalling and the creation and execution of the RESTful commands from the developer, allowing him/her to focus on developing business logic.</p>
+<p>In this section we will create a simple Java client for our DMN model.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>In this section we will create a simple Java client for our Loan Approval process.</p>
-<div class="paragraph">
 <p>Create a new Maven Java JAR project in your favourite IDE (e.g. IntelliJ, Eclipse, Visual Studio Code).</p>
-</div>
-<div class="paragraph">
+</li>
+<li>
 <p>Add the following dependency to your project:</p>
-</div>
 <div class="listingblock">
 <div class="content">
-<pre>&lt;dependency&gt;
+<pre class="highlight"><code>&lt;dependency&gt;
   &lt;groupId&gt;org.kie.server&lt;/groupId&gt;
   &lt;artifactId&gt;kie-server-client&lt;/artifactId&gt;
-  &lt;version&gt;7.30.0.Final&lt;/version&gt;
+  &lt;version&gt;7.18.0.Final&lt;/version&gt;
   &lt;scope&gt;compile&lt;/scope&gt;
-&lt;/dependency&gt;</pre>
+&lt;/dependency&gt;</code></pre>
 </div>
 </div>
 </li>
 <li>
-<p>Create a Java package in your src/main/java folder with the name com.myspace.loan_approval.</p>
+<p>Create a Java package in your <code>src/main/java</code> folder with the name <code>org.kie.dmn.lab</code>.</p>
 </li>
 <li>
-<p>Download the Applicant.java file from <a href="https://github.com/snandakumar87/loan-approval-workshop/blob/master/resources/Applicant.java">this</a> location and add it to the package you’ve just created.</p>
+<p>In the package you&#8217;ve just created, create a Java class called <code>Main</code>.</p>
 </li>
 <li>
-<p>Download the 'Loan.java' file from <a href="https://github.com/snandakumar87/loan-approval-workshop/blob/master/resources/Loan.java">this</a> location and add it to the package.</p>
+<p>Add a <code>public static void main(String[] args)</code> method to your main class.</p>
 </li>
 <li>
-<p>Create a new Java class called Main.</p>
-<div class="paragraph">
-<p>Add a public static void main(String[] args) method to your main class.</p>
-</div>
-<div class="paragraph">
 <p>Before we implement our method, we first define a number of constants that we will need when implementing our method (note that the values of your constants can be different depending on your environment, model namespace, etc.):</p>
-</div>
 <div class="listingblock">
 <div class="content">
-<pre>//Kie-server URL
-private static final String KIE_SERVER_URL = "http://localhost:8080/kie-server/services/rest/server";
-private static final String CONTAINER_ID = "loan-approval_1.0.0-SNAPSHOT";
-//PAM username
-private static final String USERNAME = "adminUser";
-//PAM password
-private static final String PASSWORD = "RedHat";
-private static final String PROCESS_ID = "loan-approval.loan-approval-wkflow";`</pre>
+<pre class="highlight"><code>private static final String KIE_SERVER_URL = "http://localhost:8080/kie-server/services/rest/server";
+private static final String CONTAINER_ID = "DMNWorkshop_1.0.0-SNAPSHOT";
+private static final String USERNAME = "pamAdmin";
+private static final String PASSWORD = "redhatpam1!";
+private static final String DMN_MODEL_NAMESPACE = "https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB";
+private static final String DMN_MODEL_NAME = "loan-approval";</code></pre>
 </div>
 </div>
 </li>
 <li>
-<p>KIE-Server client API classes can mostly be retrieved from the KieServicesFactory class. We first need to create a KieServicesConfiguration instance that will hold our credentials and defines how we want our client to communicate with the server:</p>
+<p>KIE-Server client API classes can mostly be retrieved from the <code>KieServicesFactory</code> class. We first need to create a <code>KieServicesConfiguration</code> instance that will hold our credentials and defines how we want our client to communicate with the server:</p>
 <div class="listingblock">
 <div class="content">
-<pre>KieServicesConfiguration kieServicesConfig = KieServicesFactory.newRestConfiguration(KIE_SERVER_URL, new EnteredCredentialsProvider(USERNAME, PASSWORD));</pre>
+<pre class="highlight"><code>KieServicesConfiguration kieServicesConfig = KieServicesFactory.newRestConfiguration(KIE_SERVER_URL, new EnteredCredentialsProvider(USERNAME, PASSWORD));
+kieServicesConfig.setMarshallingFormat(MarshallingFormat.JSON);</code></pre>
 </div>
 </div>
 </li>
 <li>
-<p>To allow the KIE-Server Client’s marshaller to marshall and unmarshall instances of our domain model, we need to add our domain model classes to the KieServicesConfiguration.</p>
+<p>Next, we create the <code>KieServicesClient</code>:</p>
 <div class="listingblock">
 <div class="content">
-<pre>Set&lt;Class&lt;?&gt;&gt; extraClasses = new HashSet&lt;&gt;();
-extraClasses.add(Applicant.class);
-extraClasses.add(Loan.class);
-kieServicesConfig.addExtraClasses(extraClasses);</pre>
+<pre class="highlight"><code>KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(kieServicesConfig);</code></pre>
 </div>
 </div>
 </li>
 <li>
-<p>Next, we create the KieServicesClient:</p>
+<p>From this client we retrieve our DMNServicesClient:</p>
 <div class="listingblock">
 <div class="content">
-<pre>KieServicesClient kieServicesClient = KieServicesFactory.newKieServicesClient(kieServicesConfig);</pre>
+<pre class="highlight"><code>DMNServicesClient dmnServicesClient = kieServicesClient.getServicesClient(DMNServicesClient.class);</code></pre>
 </div>
 </div>
 </li>
 <li>
-<p>From this client we retrieve our ProcessServicesClient:</p>
+<p>To pass the input values to our model to the Execution Server, we need to create a <code>DMNContext</code>:</p>
 <div class="listingblock">
 <div class="content">
-<pre>ProcessServicesClient processServicesClient = kieServicesClient.getServicesClient(ProcessServicesClient.class);</pre>
+<pre class="highlight"><code>DMNContext dmnContext = dmnServicesClient.newContext();</code></pre>
 </div>
 </div>
 </li>
 <li>
-<p>We now create a Map which we will use to pass the process input variables. We create a new Applicant instance and Loan instance and put them in the Map.</p>
+<p>We pass the input variables to the <code>DMNContext</code>. We define the following three methods that create the data inputs:</p>
 <div class="listingblock">
 <div class="content">
-<pre>Map&lt;String, Object&gt; inputData = new HashMap&lt;&gt;();
-Applicant applicant = new Applicant();
-applicant.setName("Mary");
-applicant.setCreditScore(750);
-applicant.setAge(34);
-applicant.setMonthlyIncome(8000.0);
-inputData.put("applicant", applicant);
+<pre class="highlight"><code>private static Map&lt;String, Object&gt; getApplicant() {
+	    Map&lt;String, Object&gt; applicantMap = new HashMap&lt;&gt;();
+	    applicant.put("name", "mary");
+	    applicant.put("age", 23);
+        applicant.put("creditScore", 250);
+        applicant.put("monthlyIncome", 5600);
+	    applicantMap.add(applicant);
+	    return applicantMap;
+	}
 
-Loan loan = new Loan();
-loan.setDuration(7);
-loan.setAmount(34000);
-inputData.put("loan", loan);</pre>
+
+	private static Map&lt;String, Object&gt; getLoan() {
+	    Map&lt;String, Object&gt; loanMap = new HashMap&lt;&gt;();
+	    loanMap.put("amount", 40000);
+        loanMap.put("duration",10)
+	    return loanMap;
+	}</code></pre>
 </div>
 </div>
 </li>
 <li>
-<p>We can now start a new process instance via the ProcessServicesClient.</p>
+<p>We can now add the data to the <code>DMNContext</code> as follows:</p>
 <div class="listingblock">
 <div class="content">
-<pre>Long processInstanceId = processServicesClient.startProcess(CONTAINER_ID, PROCESS_ID, inputData);</pre>
+<pre class="highlight"><code>dmnContext.set("Applicant", getApplicant());
+dmnContext.set("Loan", getLoan());</code></pre>
 </div>
 </div>
 </li>
 <li>
-<p>Finally, we can print the process instance id to System.out.</p>
+<p>We now have defined all the required instances needed to send a DMN evaluation request to the server. We explicitly specify which decision we want to evaluate, in this case the <code>Interest Rate</code> decision, by using the <code>evaluateDecisionByName</code> of the <code>DMNServiceClient</code>.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>ServiceResponse&lt;DMNResult&gt; dmnResultResponse = dmnServicesClient.evaluateDecisionByName(CONTAINER_ID, DMN_MODEL_NAMESPACE, DMN_MODEL_NAME, "Interest Rate", dmnContext);</code></pre>
+</div>
+</div>
 </li>
 <li>
-<p>System.out.println("New 'Loan Approval' process instance started with instance-id: " + processInstanceId);</p>
+<p>Finally we can retrieve the DMN evaluation result and print it in the console:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>DMNDecisionResult decisionResult = dmnResultResponse.getResult().getDecisionResultByName("Interest Rate");
+System.out.println("Interest Rate: " + decisionResult.getResult());</code></pre>
+</div>
+</div>
 </li>
 <li>
-<p>Compile your project and run it. Observe the output in the console, which should say: New 'Loan  Approval' process instance started with instance-id</p>
+<p>Compile your project and run it. Observe the output in the console.</p>
 </li>
 </ol>
 </div>
@@ -1808,7 +1484,7 @@ inputData.put("loan", loan);</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-05-18 06:40:07 -0400
+Last updated 2020-06-16 14:59:23 -0400
 </div>
 </div>
 </body>

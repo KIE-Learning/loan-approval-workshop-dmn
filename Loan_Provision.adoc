@@ -428,7 +428,7 @@ Pass the following request to lookup the Loan PreQualification decision(note tha
 ```
 {
   "model-namespace":"https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
-  "model-name":"loan-approval",
+  "model-name":"loan-approval-dmn",
   "dmn-context":{
     "Applicant":{
          "name":"Mary",
@@ -459,7 +459,7 @@ Post call should be succesful. The response looks like this.
         "source-id" : "_F999B6B9-1395-4C3D-BA41-63AC4851EE83"
       } ],
       "model-namespace" : "https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
-      "model-name" : "loan-approval",
+      "model-name" : "loan-approval-dmn",
       "decision-name" : [ ],
       "dmn-context" : {
         "Interest Rate" : 1.45,
@@ -513,7 +513,7 @@ Perform the POST request with the payload
 ```
 {
   "model-namespace":"https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
-  "model-name":"loan-approval",
+  "model-name":"loan-approval-dmn",
   "decision-name":"Interest Rate",
   "decision-id":null,
   "dmn-context":{
@@ -541,7 +541,7 @@ We can see that only the `Interest Rate` decision has been executed.
     "dmn-evaluation-result" : {
       "messages" : [ ],
       "model-namespace" : "https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
-      "model-name" : "loan-approval",
+      "model-name" : "loan-approval-dmn",
       "decision-name" : "Interest Rate",
       "dmn-context" : {
         "Interest Rate" : 1.45,
@@ -607,7 +607,7 @@ private static final String CONTAINER_ID = "DMNWorkshop_1.0.0-SNAPSHOT";
 private static final String USERNAME = "pamAdmin";
 private static final String PASSWORD = "redhatpam1!";
 private static final String DMN_MODEL_NAMESPACE = "https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB";
-private static final String DMN_MODEL_NAME = "loan-approval";
+private static final String DMN_MODEL_NAME = "loan-approval-dmn";
 ```
 . KIE-Server client API classes can mostly be retrieved from the `KieServicesFactory` class. We first need to create a `KieServicesConfiguration` instance that will hold our credentials and defines how we want our client to communicate with the server:
 +

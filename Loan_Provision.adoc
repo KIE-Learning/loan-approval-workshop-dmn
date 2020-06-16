@@ -152,9 +152,10 @@ Let us now add a new field, for this click on the `+` button on the Structure as
 +
 image:images/DMN-step-7.jpg[]
 +
+We will make this field as list of strings.
 Edit the name and data type and click on the tick mark to save the changes.
 +
-image:images/DMN-step-8.jpg[]
+image:images/DMN-step-29.jpg[]
 +
 Click on save on the DMN editor to save the changes.
 
@@ -226,3 +227,147 @@ Click on save on the DMN editor to save the changes. (Note that you can see erro
 . Next let us start defining the decision logic. Let us first define the logic for the `Interest Rate` decision.
 +
 
+For this click on edit on the node `Interest Rate`.
++
+image:images/DMN-step-19.jpg[]
++
+Now we will define the Decision type, the `Interest Rate` calculation will be a Decision table.
++
+> A decision table in DMN is a visual representation of one or more business rules in a tabular format. You use decision tables to define rules for a decision node that applies those rules at a given point in the decision model.
+
++
+image:images/DMN-step-20.jpg[]
++
+The Decision table should already pre-fill with the columns as shown below.
++
+image:images/DMN-step-21.jpg[]
++
+Now fill up table as shown below.
++
+image:images/DMN-step-22.jpg[]
++
+
+. Next we will define the BKM for the `Debt to Income` calculation. For this click on the edit context icon on the node. 
++
+image:images/DMN-step-23.jpg[]
++
+Now Click on `Edit Parameters` and add parameters for the function.
++
+image:images/DMN-step-24.jpg[]
++
+Next click on the `Select Expression` and add the formula for this calculation.
++
+image:images/DMN-step-25.jpg[]
++
+We will define this as a `Context`.
++
+> A boxed context expression in DMN is a set of variable names and values with a result value. Each name-value pair is a context entry. You use context expressions to represent data definitions in decision logic and set a value for a desired decision element within the DMN decision model.
++
+Choose the expression type to be `Context`. Now click on the Select Expression within the context as shown below and choose `Literal Expression`
++
+> A boxed literal expression in DMN is a literal FEEL expression as text in a table cell, typically with a labeled column and an assigned data type. You use boxed literal expressions to define simple or complex node logic or decision data directly in FEEL for a particular node in a decision. 
++
+image:images/DMN-step-26.jpg[]
++
+Define the formula as shown below.
++
+image:images/DMN-step-27.jpg[]
+
+. Finally let us define the logic for the `PreQualification` decision.
++
+For this click on the edit context icon for the node, and choose `Context` as the Decision type.
++
+image:images/DMN-step-28.jpg[]
++
+Let us define the data type for Context as `loanPreApproval`
++
+image:images/DMN-step-32.jpg[]
++
+
+We will define 3 types of Eligibility checks. First let us define `Age Check`. For this rename the context row as show below and choose the expression type as `Decision Table`.
++
+image:images/DMN-step-30.jpg[]
++
+Edit the input column to check for `Applicant` age.
++
+image:images/DMN-step-31.jpg[]
++
+Now define the output column's data type as `loanPreApproval`. We will need to define the `preApproval` and  `reason` fields of the result object. For this, click on the column and right click to add rows to the left.
++
+image:images/DMN-step-33.jpg[]
++
+Now change the main column header's data type as show in the below image to be `loanPreApproval`.
++
+image:images/DMN-step-34.jpg[]
++
+Rename and edit type for the column underneath for `preApproval`
++
+image:images/DMN-step-35.jpg[]
++
+Rename and edit type for the column underneath for `reason`
++
+image:images/DMN-step-36.jpg[]
++
+Now add the decision row as shown in the image.
++
+image:images/DMN-step-37.jpg[]
++
+We will insert the next row for `Credit Check`. For this click on the context row and right click to add a new row.
++
+image:images/DMN-step-38.jpg[]
++
+Rename the context row and set the data type as we did for the  `Age Eligibility`.
++
+image:images/DMN-step-39.jpg[]
++
+We will againd define a decision table
++
+image:images/DMN-step-40.jpg[]
++
+Now set the input column to now read the credit score from the `Applicant` object.
++
+image:images/DMN-step-41.jpg[]
++
+Like we did for the previous conext row, set the output column to be `loanPreApproval`. Now define the rule as below.
++
+
+image:images/DMN-step-42.jpg[]
++
+We will now define `Debt Ratio Check`, for this we first need to invoke the Function (BKM) we created. Create a new context row.
++
+image:images/DMN-step-43.jpg[]
++
+On the expression type select `Invocation`.
++
+image:images/DMN-step-44.jpg[]
++
+Define the name of the function `Debt to Income` and start defining the parameters for the BKM.
++
+image:images/DMN-step-45.jpg[]
++
+For this choose the Literal expression type and define the value.
++
+image:images/DMN-step-46.jpg[]
++
+Similarly define all the parameters for the BKM, by right clicking on the parameter row and adding rows.
++
+
+image:images/DMN-step-47.jpg[]
++
+Now that we have invoked the function, lets create a new context row for the `Debt Ratio Check`.
++
+image:images/DMN-step-48.jpg[]
++
+Define the expression type as Decision table as we did for the earlier checks and define the rule as below.
++
+image:images/DMN-step-49.jpg[]
++
+Finally lets combine the results of all these checks. For this create a new context row and name it preApprovalStatus. We will add the expression type as Literal Expression and we will define a FEEL expression that combines the preApproval status from all of the previous checks.
++
+
+image:images/DMN-step-50.jpg[]
++
+Similarly, let us also define a FEEL expression for combining the reason string for each of the checks.
++
+image:images/DMN-step-51.jpg[]
++

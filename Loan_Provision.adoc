@@ -273,10 +273,13 @@ Choose the expression type to be `Context`. Now click on the Select Expression w
 image:images/DMN-step-26.jpg[]
 +
 Define the formula for MonthlyRepayment 
++
 ```
 ((interestRate * loanAmount / 100) + loanAmount) / (loanDuration * 12)
 ```
++
 And the Debt to income ratio as 
++
 ```
 (Monthly Repayment / monthlyIncome) * 100
 ```
@@ -382,7 +385,7 @@ Finally lets combine the results of all these checks. For this create a new cont
 ```
 all(Age Eligibility.preApproval, Credit Check.preApproval, Debt Ratio Check.preApproval)   
 ```
-
++
 image:images/DMN-step-50.jpg[]
 +
 Similarly, let us also define a FEEL expression for combining the reason string for each of the checks. For this we will use the Union FEEL expressoin.
@@ -392,6 +395,7 @@ Similarly, let us also define a FEEL expression for combining the reason string 
 ```
 union(Age Eligibility.reason, Credit Check.reason, Debt Ratio Check.reason)
 ```
++
 image:images/DMN-step-51.jpg[]
 +
 Finally return the combined value for the Context.

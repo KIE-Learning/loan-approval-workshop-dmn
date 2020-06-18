@@ -457,6 +457,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="paragraph">
 <p>This workshop is aimed at providing hands on experience creating DMN assets. This lab will implement a Loan Approval workflow.</p>
 </div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>Decision Model and Notation (DMN) is a standard established by the Object Management Group (OMG) for describing and modeling operational decisions. DMN defines an XML schema that enables DMN models to be shared between DMN-compliant platforms and across organizations so that business analysts and business rules developers can collaborate in designing and implementing DMN decision services.
+The DMN spec can be found <a href="https://www.omg.org/spec/DMN/1.2/PDF">here</a>.</p>
+</div>
+</blockquote>
+</div>
 <div class="ulist">
 <div class="title">Goals</div>
 <ul>
@@ -945,7 +953,20 @@ Edit the name and data type and click on the tick mark to save the changes.</p>
 <p><span class="image"><img src="images/DMN-step-26.jpg" alt="DMN step 26"></span></p>
 </div>
 <div class="paragraph">
-<p>Define the formula as shown below.</p>
+<p>Define the formula for MonthlyRepayment</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>((interestRate * loanAmount / 100) + loanAmount) / (loanDuration * 12)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And the Debt to income ratio as</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>(Monthly Repayment / monthlyIncome) * 100</code></pre>
+</div>
 </div>
 <div class="paragraph">
 <p><span class="image"><img src="images/DMN-step-27.jpg" alt="DMN step 27"></span></p>
@@ -1051,7 +1072,10 @@ For this click on the edit context icon for the node, and choose <code>Context</
 <p><span class="image"><img src="images/DMN-step-44.jpg" alt="DMN step 44"></span></p>
 </div>
 <div class="paragraph">
-<p>Define the name of the function <code>Debt to Income</code> and start defining the parameters for the BKM.</p>
+<p>Define the name of the function <code>Debt to Income</code> and start defining the parameters for the BKM. This will have to be in the header of the invocation.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="images/DMN-step-61.jpg" alt="DMN step 61"></span></p>
 </div>
 <div class="paragraph">
 <p><span class="image"><img src="images/DMN-step-45.jpg" alt="DMN step 45"></span></p>
@@ -1078,22 +1102,51 @@ For this click on the edit context icon for the node, and choose <code>Context</
 <p>Define the expression type as Decision table as we did for the earlier checks and define the rule as below.</p>
 </div>
 <div class="paragraph">
-<p><span class="image"><img src="images/DMN-step-49.jpg" alt="DMN step 49"></span></p>
+<p><span class="image"><img src="images/DMN-step-60.jpg" alt="DMN step 60"></span></p>
 </div>
 <div class="paragraph">
 <p>Finally lets combine the results of all these checks. For this create a new context row and name it preApprovalStatus. We will add the expression type as Literal Expression and we will define a FEEL expression that combines the preApproval status from all of the previous checks.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>The <code>all</code> FEEL function according to the spec return false if any item is false, else true if empty or all items are true, else null</p>
+</div>
+</blockquote>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>all(Age Eligibility.preApproval, Credit Check.preApproval, Debt Ratio Check.preApproval)</code></pre>
+</div>
 </div>
 <div class="paragraph">
 <p><span class="image"><img src="images/DMN-step-50.jpg" alt="DMN step 50"></span></p>
 </div>
 <div class="paragraph">
-<p>Similarly, let us also define a FEEL expression for combining the reason string for each of the checks.</p>
+<p>Similarly, let us also define a FEEL expression for combining the reason string for each of the checks. For this we will use the Union FEEL expressoin.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>The <code>union</code> FEEL function according to the spec returns concatenated result(with duplicate removal).</p>
+</div>
+</blockquote>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>union(Age Eligibility.reason, Credit Check.reason, Debt Ratio Check.reason)</code></pre>
+</div>
 </div>
 <div class="paragraph">
 <p><span class="image"><img src="images/DMN-step-51.jpg" alt="DMN step 51"></span></p>
 </div>
 <div class="paragraph">
 <p>Finally return the combined value for the Context.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>{"preApproval":preApprovalStatus, "reason":reasonList[item != null]}</code></pre>
+</div>
 </div>
 <div class="paragraph">
 <p><span class="image"><img src="images/DMN-step-52.jpg" alt="DMN step 52"></span></p>
@@ -1153,6 +1206,9 @@ For this click on the edit context icon for the node, and choose <code>Context</
 </li>
 </ol>
 </div>
+<div class="paragraph">
+<p>The completed code base can be found <a href="https://github.com/snandakumar87/loan-approval-workshop-dmn-code">here</a></p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_testing_the_dmn_using_rest_api">3.4. Testing the DMN using REST API</h3>
@@ -1182,7 +1238,7 @@ For this click on the edit context icon for the node, and choose <code>Context</
 <div class="content">
 <pre class="highlight"><code>{
   "model-namespace":"https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
-  "model-name":"loan-approval",
+  "model-name":"loan-approval-dmn",
   "dmn-context":{
     "Applicant":{
          "name":"Mary",
@@ -1215,7 +1271,7 @@ For this click on the edit context icon for the node, and choose <code>Context</
         "source-id" : "_F999B6B9-1395-4C3D-BA41-63AC4851EE83"
       } ],
       "model-namespace" : "https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
-      "model-name" : "loan-approval",
+      "model-name" : "loan-approval-dmn",
       "decision-name" : [ ],
       "dmn-context" : {
         "Interest Rate" : 1.45,
@@ -1272,7 +1328,7 @@ For this click on the edit context icon for the node, and choose <code>Context</
 <div class="content">
 <pre class="highlight"><code>{
   "model-namespace":"https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
-  "model-name":"loan-approval",
+  "model-name":"loan-approval-dmn",
   "decision-name":"Interest Rate",
   "decision-id":null,
   "dmn-context":{
@@ -1302,7 +1358,7 @@ For this click on the edit context icon for the node, and choose <code>Context</
     "dmn-evaluation-result" : {
       "messages" : [ ],
       "model-namespace" : "https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB",
-      "model-name" : "loan-approval",
+      "model-name" : "loan-approval-dmn",
       "decision-name" : "Interest Rate",
       "dmn-context" : {
         "Interest Rate" : 1.45,
@@ -1337,6 +1393,9 @@ For this click on the edit context icon for the node, and choose <code>Context</
   }
 }</code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>Completed code can be found here : <a href="https://github.com/snandakumar87/loan-approval-workshop-dmn-code" class="bare">https://github.com/snandakumar87/loan-approval-workshop-dmn-code</a></p>
 </div>
 </li>
 </ol>
@@ -1386,7 +1445,7 @@ private static final String CONTAINER_ID = "DMNWorkshop_1.0.0-SNAPSHOT";
 private static final String USERNAME = "pamAdmin";
 private static final String PASSWORD = "redhatpam1!";
 private static final String DMN_MODEL_NAMESPACE = "https://kiegroup.org/dmn/_594C71E-790B-4A16-A81B-45F251780ADB";
-private static final String DMN_MODEL_NAME = "loan-approval";</code></pre>
+private static final String DMN_MODEL_NAME = "loan-approval-dmn";</code></pre>
 </div>
 </div>
 </li>
@@ -1484,7 +1543,7 @@ System.out.println("Interest Rate: " + decisionResult.getResult());</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-06-16 14:59:23 -0400
+Last updated 2020-06-17 23:38:08 -0400
 </div>
 </div>
 </body>

@@ -5,6 +5,9 @@
 == Red Hat Process Automation Manager Workshop - DMN
 This workshop is aimed at providing hands on experience creating DMN assets. This lab will implement a Loan Approval workflow. 
 
+> Decision Model and Notation (DMN) is a standard established by the Object Management Group (OMG) for describing and modeling operational decisions. DMN defines an XML schema that enables DMN models to be shared between DMN-compliant platforms and across organizations so that business analysts and business rules developers can collaborate in designing and implementing DMN decision services.  
+The DMN spec can be found link:https://www.omg.org/spec/DMN/1.2/PDF[here].
+
 .Goals
 * Define a Loan Pre Approval Decision flow using DMN
 * Test the DMN asset using the Test Scenario tooling
@@ -269,7 +272,14 @@ Choose the expression type to be `Context`. Now click on the Select Expression w
 +
 image:images/DMN-step-26.jpg[]
 +
-Define the formula as shown below.
+Define the formula for MonthlyRepayment 
+```
+((interestRate * loanAmount / 100) + loanAmount) / (loanDuration * 12)
+```
+And the Debt to income ratio as 
+```
+(Monthly Repayment / monthlyIncome) * 100
+```
 +
 image:images/DMN-step-27.jpg[]
 
@@ -342,7 +352,9 @@ On the expression type select `Invocation`.
 +
 image:images/DMN-step-44.jpg[]
 +
-Define the name of the function `Debt to Income` and start defining the parameters for the BKM.
+Define the name of the function `Debt to Income` and start defining the parameters for the BKM. This will have to be in the header of the invocation.
++
+image:images/DMN-step-61.jpg[]
 +
 image:images/DMN-step-45.jpg[]
 +
@@ -361,18 +373,32 @@ image:images/DMN-step-48.jpg[]
 +
 Define the expression type as Decision table as we did for the earlier checks and define the rule as below.
 +
-image:images/DMN-step-49.jpg[]
+image:images/DMN-step-60.jpg[]
 +
-Finally lets combine the results of all these checks. For this create a new context row and name it preApprovalStatus. We will add the expression type as Literal Expression and we will define a FEEL expression that combines the preApproval status from all of the previous checks.
+Finally lets combine the results of all these checks. For this create a new context row and name it preApprovalStatus. We will add the expression type as Literal Expression and we will define a FEEL expression that combines the preApproval status from all of the previous checks. 
 +
+> The `all` FEEL function according to the spec return false if any item is false, else true if empty or all items are true, else null
++
+```
+all(Age Eligibility.preApproval, Credit Check.preApproval, Debt Ratio Check.preApproval)   
+```
 
 image:images/DMN-step-50.jpg[]
 +
-Similarly, let us also define a FEEL expression for combining the reason string for each of the checks.
+Similarly, let us also define a FEEL expression for combining the reason string for each of the checks. For this we will use the Union FEEL expressoin.
 +
+> The `union` FEEL function according to the spec returns concatenated result(with duplicate removal).
++
+```
+union(Age Eligibility.reason, Credit Check.reason, Debt Ratio Check.reason)
+```
 image:images/DMN-step-51.jpg[]
 +
 Finally return the combined value for the Context.
++
+```
+{"preApproval":preApprovalStatus, "reason":reasonList[item != null]}
+```
 +
 image:images/DMN-step-52.jpg[]
 
@@ -408,6 +434,8 @@ Now click on Test and it should be succesful.
 . Inspect the Coverage Reports from the right side pane to see the decisions fired as a part of the rule set.
 +
 image:images/DMN-step-58.jpg[]
+
+The completed code base can be found link:https://github.com/snandakumar87/loan-approval-workshop-dmn-code[here]
 
 === Testing the DMN using REST API
 For testing the DMN using REST APIs we will first build and deploy the DMN project. On the project landing page, click on `Deploy` button. 
@@ -576,6 +604,7 @@ We can see that only the `Interest Rate` decision has been executed.
   }
 }
 ```
+Completed code can be found here : https://github.com/snandakumar87/loan-approval-workshop-dmn-code
 
 === Testing the DMN using Java APIs
 

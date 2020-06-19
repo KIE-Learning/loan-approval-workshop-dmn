@@ -1,0 +1,221 @@
+
+
+== Problem Statement
+In  this lab we will create a decision that determines if a call-centre can take an incoming call. Whether a call will be accepted by a certain office depends on:
+
+* The office accepts the call.
+* There are employees currently available at the office.
+
+Whether the office can accepts a call depends on:
+* whether the phone number has been banned.
+* the purpose of the phone call ("help" or "objection")
+
+
+== Create a Decision Project
+To define and deploy a DMN decision model, we first need to create a new project in which we can store the model. To create a new project:
+
+. Navigate to {business_central}
+. Login to the platform with the provided username and password.
+. Click on **Design** to navigate to the Design perspective.
++
+image:images/business-central-design.png[]
++
+. In the Design perspective, create a new project. If your space is empty, this can be done by clicking on the blue **Add Project** button in the center of the page. If you already have projects in your space, you can click on the blue **Add Project** icon at the top right of the page.
+. Give the project the name `call-centre-decisions`, and the description "Call Centre Decisions".
++
+image:images/add-project-call-centre-decisions.png[]
++
+. With the project created, we can now create our DMN model. Click on the blue **Add Asset** button.
+. In the **Add Asset** page, select **Decision** in the dropdown filter selector.
++
+image:images/new-asset-decisions-filter.png[]
++
+. Click on the **DMN** tile to create a new DMN model. Give it the name `call-centre`. This will create the asset and open the DMN editor.
+
+image:images/add-dmn-call-centre.png[]
+
+== Solution
+
+You can do this lab in 2 ways:
+
+. If you already have (some) DMN knowledge, we would like to challenge you to build the solution by yourself. After you've built solution, you can verify your answer by going to the next module in which we will explain the solution and will deploy it onto the runtime.
+. Follow this step-by-step guide which will guide you through the implementation.
+
+== The Main Decision
+
+The problem statement describes a number of different inputs to our decision:
+
+* **Call**: the incoming call into the call-centre
+* **Employees**: the employees of certain office.
+* **Office**: an office to which the call could potentially be routed.
+
+Furthermore, the problem statement describes that phone numbers could be banned. So, also **banned numbers** can be regarded as an input to our model (although we will not implement it as an input in this lab).
+
+With the given input, we need to make the following decision:
+
+* **Accept Call**: the final decision we need to make is whether the given office will accept the call.
+
+. Add a **Decision** node to the diagram by clicking on the **Decision** node icon and placing it in the DRD
+. Add an **Input** node to the diagram by clicking on the **Input** node icon and placing it in the DRD.
++
+image:images/add-drd-decision-node.png[Input]
++
+. Double-click on the node to set the name. We will name this node `Accept Call`.
+. With the `Accept Call` node selected, open the property panel. Set the **Output data type** to `boolean`.
++
+image:images/drd-decision-node-propery-output-data-type.png[Output Data Type]
++
+. The input of this decision is the **incoming call**, **office** and **employee**. Create these 3 input nodes and connect them to the **Accept Call** decision.
++
+image:images/drd-first-decision-and-inputs.png[Decision and Inputs]
++
+. We can now set data types of our input nodes.
+.. Click on the `incoming call` node, open the property panel and in the **Output data type** section and click on the **Manage** button. This will open the **Custom Data Types** window.
+.. In the **Custom Data Types** window, click on the **+ Add** button.
+.. Define the data tyoe `tPhoneNumber` as follows:
++
+image:images/data-type-tphonenumber.png[Data Type tPhonenumber]
++
+.. Define another data type `tCall` as follows. Note that this datatype has a field that is of type `tPhoneNumber`, the type we defined earlier:
++
+image:images/data-type-tcall.png[Data Type tCall]
++
+.. When you've created the `tCall`  type, go back to the DRD by clicking on the **Model** tab.
+.. Select the `incoming call` node, and in the property panel, set the node's **Output data type** to `tCall`
++
+image:images/incoming-call-data-type.png[Incoming Call Data Type]
++
+. Next, define the following data type  and set it as the **Output data type** of the `office` input as such:
++
+image:images/data-type-office.png[Data Type Office]
++
+. Define the data type for `employees` as follows. Note that we've first defined the type `tEmployee`, and afterwards we've defined `tEmployees` as a `List` of `tEmployee`.
++
+image:images/employee-type.png[Employee Type]
+
+== Decision Service
+With the main structure defined, we can now look at the requirements of the decision whether the office can actually accept the call.
+As defined in the problem statement, this depends on:
+
+* whether the phone number has been banned.
+* the purpose of the phone call ("help" or "objection").
+
+We will model this decision as a DMN **Decision Service** that can be called by our main decision `Accept Call`.
+
+. First, model the **Decision Service** in the DRD and give it the name `Can Handle Call`. Set it's **Output data type** to `boolean`.
++
+image:images/decision-service-can-handle-call.png[Decision Service Can Handle Call]
++
+. Add a **Decision Node** to the **Decision Service**. Name it `Call Can Be Handled` and set it's **Output data type** to `boolean`.
++
+image:images/decision-service-with-decision-node.png[Decision Service With Decision Node]
++
+. Add 2 additional **Decision Nodes** and name them `Is Banned` and `Call Purpose Accepted`. Both should have an **Output data type** of type `boolean`.
+. Connect the 2 **Decision Nodes** to the `Call Can Be Handled` node.
++
+image:images/decision-service-step-3.png[Decision Service With Decision Node]
++
+. The input to both the `Is Banned` and `Call Purpose Accepted` decisions is a `call`. Create a new **Input** node, name it `call`, set it's **Output data type** to `tCall` and connect it to the 2 decision nodes.
++
+image:images/decision-service-call-input.png[Decision Service Call Input]
++
+. The `Is Banned` decision also needs a collection of banned phone numbers. Instead of implementing this as an **Input** node, we will implement this as a DMN **Relation Decision**.
+.. Create a new **Decision Node** and name it `Banned Phone Numbers`. Connect it to the `Is Banned` decision node.
++
+image:images/decision-service-banned-phone-number.png[Decision Service Banned Phone Number]
++
+.. The **Ouput data type** of this nodes is a new custom data type, which is a list of `tPhoneNumber`. We'll name this type `tPhoneNumbers`:
++
+image:images/data-type-tphonenumbers.png[Data Type Phone Numbers]
++
+.. Click on the **Edit** button of the `Banned Phone Numbers` node. Set the **logic type** of the decision to `Relation`. Create the following table:
++
+image:images/banned-phone-number-relation.png[Banned Phone Number Relation]
++
+. We can now implement the logic of the `Is Banned` decision. Click on the **Edit** button of the decision node. We will implement the logic as a **Literal Expression**. Define the following FEEL expression:
++
+```
+list contains(Banned Phone Numbers, call.phone)
+```
++
+. The next node for which we want to implement the decision logic is `Call Purpose Accepted`. Click on the node, and click on the **Edit** button. Implement the following logic as a **Decision Table**:
++
+image:images/CallPurposeAccepted-decision.png[Call Purpose Accepted Decision]
++
+. We can now implement the decision of `Call Can Be Handled`. Click on the node and click on the node's **Edit** button. In the decision editor, set the **logic type** to **Decision Table** and implement the following table:
++
+image:images/CanHandleCall-decision.png[Can Handle Call Decision]
++
+. Create a DMN **Knowledge Requirement** from the `Can Handle Call` decision service to the `Accept Call` decision.
++
+image:images/decision-service-knowledge-requirement.png[Decision Service Knowledge Requirement]
++
+. Implement the `Accept Call` decision logic as follows.
+image:images/Accept-Call-decision.png[Accept Cal Decision]
+
+
+
+== Deploying the Decision Service
+
+With our decision model completed, we can now package our DMN model in a Deployment Unit (KJAR) and deploy it on the Execution Server. To do this:
+
+. In the bread-crumb navigation in the upper-left corner, click on `call-centre -decisions` to go back to the project's Library View.
+. Click on the **Deploy** button in the upper-right corner of the screen. This will package our DMN mode in a Deployment Unit (KJAR) and deploy it onto the Execution Server (KIE-Server).
+. Go to the **Execution Servers** perspective by clicking on "Menu -> Deploy -> Execution Servers". You will see the **Deployment Unit** deployed on the Execution Server.
+
+== Test DMN Solution
+
+In this section, you will test the DMN solution with Execution Server's Swagger interface.
+
+The Swagger interface provides the description and documentation of the Execution Server's RESTful API. At the same time, it allows the APIs to be called from the UI. This enables developers and users to quickly test a, in this case, a deployed DMN Service .
+
+. Navigate to {kie_server} swagger docs
+. Locate the **DMN Models** section. The DMN API provides the DMN model as a RESTful resources, which accepts 2 operations:
+.. `GET`: Retrieves the DMN model.
+.. `POST`: Evaluates the decisions for a given input.
+. Expand the `GET` operation by clicking on it.
+. Click on the **Try it out** button.
+. Set the **containerId** field to `call-centre-decisions_1.0.0` and set the **Response content type** to `application/json` and click on **Execute**
+image:images/dmn-swagger-get.png[DMN Swagger Get]
+. If requested, provide the username and password of your **Business Central** and **KIE-Server** user.
+. The response will be the model-description of your DMN model.
+
+Next, we will evaluate our model with some input data. We need to provide our model with the **age** of an employee and the number of **years of service**. Let's try a number of different values to test our deicions.
+
+. Expand the `POST` operation and click on the **Try it out** button
+. Set the **containerId** field to `call-centre-decisions_1.0.0-SNAPSHOT`. Set the **Parameter content type** and **Response content type** fields to `application/json`.
+. Set the **model-namespace** by looking up the namespace of your model in the response/result of the `GET` operation you executed ealier, which returned the model description.
+. Pass the following request to evaluate whether the given call is accepted by the call-centre.
++
+NOTE: We're explicitly specifying the **decision-name** of the decision we want to evaluate. If we would not specify this, the engine will evaluate the full model, and hence will also require us to pass the `call` input. When we only evaluate the `Accept Call` decision, we only need to specify the inputs of `Accept Call`. In the decision service invocation in the `Accept Call` logic, the input `incoming call` is passed to the `call` parameter of the decision service.
++
+NOTE: The namespace of your model is probably different as it is generated. You can lookup the namespace of your model in the response/result of the `GET` operation you executed earlier, which returned the model description.
++
+```
+{
+  "model-namespace":"https://github.com/kiegroup/drools/kie-dmn/_E5C7F40E-CF45-451C-B3F4-6B0C97A1B131",
+  "model-name":"call-centre",
+  "decision-name": "Accept Call",
+  "decision-id":null,
+  "dmn-context":{
+    "incoming call":{
+      "phone": {
+        "country prefix": "+420",
+        "phone number": "1234"
+      },
+      "purpose": "help"
+    },
+    "employees": [
+    	{
+    		"name": "Duncan",
+    		"office location": "Rome"
+    	}
+    ],
+    "office": {
+    	"location": "Rome"
+    }
+  }
+}
+```
+. Click on **Execute**. The result value of the `Accept Call` should be `true`.
+. Test the service with a number of other values. For example, specify a banned phone number like: +421 92000001
